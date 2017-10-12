@@ -1,0 +1,11 @@
+# Ignores
+bootstrap/
+build/
+dist/
+documentation/
+logs/
+nbproject/
+pages/
+plugins/
+core/
+/bootstrap
