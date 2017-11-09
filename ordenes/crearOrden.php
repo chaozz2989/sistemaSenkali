@@ -4,9 +4,13 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["user_id"] == null) {
     print "<script>alert(\"Acceso invalido!\");window.location='index.php';</script>";
 }
 //$_SESSION['detalle'] = array();
-//require_once('../funciones/funcionOrd.php');
+require_once('../funciones/fOrdenes.php');
 require_once ('../funciones/funcion.php');
 require_once ('../funciones/fProductos.php');
+require_once ('../funciones/fClientes.php');
+require_once ('../funciones/fCategorias.php');
+
+date_default_timezone_set('America/El_Salvador');
 /* $objFuncion = new Funcion();
   $resultadoFuncion = $objFuncion->get();
   $ordenes=$objFuncion->comboEstadoOrden(); */
@@ -29,10 +33,6 @@ require_once ('../funciones/fProductos.php');
         <link rel="stylesheet" href="../plugins/daterangepicker/daterangepicker.css">
         <!-- bootstrap datepicker -->
         <link rel="stylesheet" href="../plugins/datepicker/datepicker3.css">
-        <!-- iCheck for checkboxes and radio inputs -->
-        <link rel="stylesheet" href="../plugins/iCheck/all.css">
-        <!-- Bootstrap Color Picker -->
-        <link rel="stylesheet" href="../plugins/colorpicker/bootstrap-colorpicker.min.css">
         <!-- Bootstrap time Picker -->
         <link rel="stylesheet" href="../plugins/timepicker/bootstrap-timepicker.min.css">
         <!-- Select2 -->
@@ -57,8 +57,6 @@ require_once ('../funciones/fProductos.php');
         <script src="../plugins/daterangepicker/daterangepicker.js"></script>
         <!-- bootstrap datepicker -->
         <script src="../plugins/datepicker/bootstrap-datepicker.js"></script>
-        <!-- bootstrap color picker -->
-        <script src="../plugins/colorpicker/bootstrap-colorpicker.min.js"></script>
         <!-- bootstrap time picker -->
         <script src="../plugins/timepicker/bootstrap-timepicker.min.js"></script>
         <!-- SlimScroll 1.3.0 -->
@@ -112,7 +110,7 @@ require_once ('../funciones/fProductos.php');
                         <!-- Left col -->
                         <div class="col-md-12">
                             <!-- Trigger the modal with a button -->
-                            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal"> Ver Listado de Ordenes</button>
+                            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal"> Ver Ordenes Pendientes</button>
 
                             <!-- Modal -->
                             <div id="myModal" class="modal fade" role="dialog">
@@ -122,7 +120,7 @@ require_once ('../funciones/fProductos.php');
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                            <h4 class="modal-title">Listado de Ordenes</h4>
+                                            <h4 class="modal-title">Ordenes Pendientes</h4>
                                         </div>
                                         <div class="modal-body">
                                             <?php
@@ -131,7 +129,7 @@ require_once ('../funciones/fProductos.php');
                                             ?>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                                         </div>
                                     </div>
 
@@ -144,7 +142,7 @@ require_once ('../funciones/fProductos.php');
 
                                 <div class="box box-primary">
                                     <div class="box-header with-border">
-                                        <h3 class="box-title">Crear Orden</h3>
+                                        <h3 class="box-title">Nueva Orden</h3>
                                     </div>
                                     <!-- /.box-header -->
                                     <!-- form start -->
@@ -152,7 +150,7 @@ require_once ('../funciones/fProductos.php');
                                         <div class="box-body">
                                             <div class="form-group">
                                                 <label>Mesa:</label>
-                                                <select class="form-control select2" style="width: 100%;" name="mesa" id="mesa" required="true">
+                                                <select class="form-control select2" style="width: 100%;" name="lst_mesa" id="lst_mesa" required="true">
                                                     <option value="">- Seleccione una mesa-</option>
                                                     <?php
                                                     $mesas = getMesas();
@@ -167,13 +165,17 @@ require_once ('../funciones/fProductos.php');
 
                                             <div class="form-group">
                                                 <label>Empleado:</label>
-                                                <select class="form-control select2" style="width: 100%;" name="emp" id="emp" required="true">
+                                                <select class="form-control select2" style="width: 100%;" name="lst_emp" id="lst_emp" required="true">
                                                     <option value="">- Seleccione Empleado-</option>
                                                     <?php
                                                     $empleados = getEmpleados();
 
                                                     foreach ($empleados as $indice => $registro) {
-                                                        echo "<option value=" . $registro['id_empleado'] . ">" . $registro['nombres'] . "-" . $registro['apellidos'] . "</option>";
+                                                        echo "<option value=" . $registro['id_empleado'] . " ";
+                                                        if ($registro['id_empleado'] == $_SESSION['user_id']) {
+                                                            echo "selected = true";
+                                                        }
+                                                        echo ">" . $registro['nombres'] . "-" . $registro['apellidos'] . "</option>";
                                                     }
                                                     ?>
                                                 </select>
@@ -182,13 +184,16 @@ require_once ('../funciones/fProductos.php');
 
                                             <div class="form-group">
                                                 <label>Tipo Orden:</label>
-                                                <select class="form-control select2" style="width: 100%;" name="torden" id="torden" required="true">
+                                                <select class="form-control select2" style="width: 100%;" name="lst_tipoOrd" id="lst_tipoOrd" required="true">
                                                     <option value="">- Seleccione-</option>
                                                     <?php
                                                     $tipoOrden = getTiposOrden();
 
                                                     foreach ($tipoOrden as $indice => $registro) {
-                                                        echo "<option value=" . $registro['id_tipoOrd'] . ">" . $registro['tipo_orden'] . "</option>";
+                                                        echo "<option value=" . $registro['id_tipoOrd'];
+                                                        if ($registro['id_tipoOrd'] == 1)
+                                                            echo ' selected=true';
+                                                        echo ">" . $registro['tipo_orden'] . "</option>";
                                                     }
                                                     ?>
                                                 </select>
@@ -197,12 +202,16 @@ require_once ('../funciones/fProductos.php');
 
                                             <div class="form-group">
                                                 <label>Estado de la Orden:</label>
-                                                <select class="form-control select2" style="width: 100%;" name="estadoOrd" id="estadoOrd" required="true">
+                                                <select class="form-control select2" style="width: 100%;" name="lst_estOrd" id="lst_estOrd" required="true" disabled="true" >
                                                     <option value="">- Seleccione-</option>
                                                     <?php
                                                     $estadoOrd = getEstadosOrden();
                                                     foreach ($estadoOrd as $indice => $registro) {
-                                                        echo "<option value=" . $registro['id_estadosOrden'] . ">" . $registro['estado'] . "</option>";
+                                                        echo "<option value=" . $registro['id_estadosOrden'];
+                                                        if ($registro['id_estadosOrden'] == 1) {
+                                                            echo ' selected = true';
+                                                        }
+                                                        echo ">" . $registro['estado'] . "</option>";
                                                     }
                                                     ?>
                                                 </select>
@@ -211,26 +220,53 @@ require_once ('../funciones/fProductos.php');
 
                                             <div class="form-group">
                                                 <label>Fecha:</label>
-
                                                 <div class="input-group date">
                                                     <div class="input-group-addon">
                                                         <i class="fa fa-calendar"></i>
                                                     </div>
-                                                    <input type="text" class="form-control pull-right" id="fecha" name="fecha">
+                                                    <input type="text" class="form-control pull-right" id="date_fechaOrd" name="date_fechaOrd" 
+                                                           value="<?php echo date('m/d/Y'); ?>" >
                                                 </div>
                                                 <!-- /.input group -->
                                             </div>
 
                                             <div class="form-group">
-                                                <label>Es Cliente</label>
+                                                <label>Hora:</label>
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-clock-o"></i>
+                                                    </div>
+                                                    <input type="text" class="form-control timepicker" id="time_horaOrd" name="time_horaOrd" 
+                                                           value="<?php echo date("h:i a"); ?>" >
+                                                    <!-- /.input group -->
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label>Es Cliente: </label>
                                                 <label>
-                                                    <input type="checkbox" class="minimal" name="cliente" value="1">
+                                                    <input type="checkbox" class="minimal" name="chk_esCliente" id="chk_esCliente" value="1" onclick="mostrarClientes();" checked>
                                                 </label>   
+                                            </div>
+
+                                            <div class="form-group" id="listadoClientes">
+                                                <label>Cliente: </label>
+                                                <select name="lst_cliente" id="lst_cliente" class="form-control select2" required="true">
+                                                    <option value="">- Seleccione-</option>
+
+                                                    <?php
+                                                    $cliente = getClientes();
+                                                    foreach ($cliente as $indice => $registro):
+                                                        ?>
+                                                        <option value="<?php echo $registro['id_clientes'] ?>"><?php echo $registro['nombre'] . ' ' . $registro['apellido']; ?></option>
+                                                    <?php endforeach; ?>
+
+                                                </select>
                                             </div>
 
                                         </div>
                                         <!-- /.box-body -->
-
+                                        <input type="hidden" id="totalGlobal" name="totalGlobal" >
                                         <div class="box-footer">
                                             <button type="submit" class="btn btn-primary">Crear</button>
                                             <button type="reset" class="btn btn-danger">Limpiar</button>
@@ -241,10 +277,9 @@ require_once ('../funciones/fProductos.php');
                             </section>
                         </div> 
 
-
                         <div class="col-md-5">
 
-                            <!--***********************SECCIÓN A MODIFICAR******************************-->
+                            <!--***********************SECCIÓN DETALLE DE ORDEN******************************-->
                             <section>
                                 <div class="box box-primary">
                                     <div class="box-header with-border">
@@ -253,48 +288,50 @@ require_once ('../funciones/fProductos.php');
                                     <form method="post" id="formulario">
                                         <div class="box-body">
                                             <div class="form-group">
-                                                <label>Estado Producto</label>
+                                                <label>Categoría</label>
 
-                                                <select name="cbo_estado" id="cbo_estado" class="col-md-2 form-control"required="true">
-                                                    <option value="">- Seleccione-</option>
+                                                <select name="lst_catProd" id="lst_catProd" class="col-md-2 form-control" required="true">
+                                                    <option value="">-Seleccione-</option>
 
                                                     <?php
-                                                    foreach ($estadoOrd as $indice => $registro) {
-                                                        echo "<option value=" . $registro['id_estadosOrden'] . ">" . $registro['estado'] . "</option>";
+                                                    $categorias = getCategorias();
+                                                    foreach ($categorias as $indice => $registro) {
+                                                        echo "<option value=" . $registro['id_categoria'] . ">" . $registro['nombre'] . "</option>";
                                                     }
                                                     ?>
 
                                                 </select>
-                                            </div>    
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="subcatProd">SubCategoría del Producto</label>
+                                                <select class="col-md-2 form-control" style="width: 100%;" name="lst_subcatProd" id="lst_subcatProd" required="true">
+                                                    <option value="">-Seleccione una SubCategoría-</option>
+                                                </select>
+                                            </div>
 
                                             <div class="form-group">
                                                 <label>Producto:</label>
-                                                <select name="cbo_producto" id="cbo_producto" class="col-md-2 form-control" required="true">
+                                                <select name="lst_producto" id="lst_producto" class="col-md-2 form-control" required="true">
                                                     <option value="">- Seleccione-</option>
-
-                                                    <?php
-                                                    $productos = getTablaProductos();
-                                                    foreach ($productos as $indice => $registro):
-                                                        ?>
-                                                        <option value="<?php echo $registro['id_productos'] ?>"><?php echo $registro['nombre_prod'] ?></option>
-                                                    <?php endforeach; ?>
-
                                                 </select>
-                                            </div>  
-
-
+                                            </div>
                                             <div class="form-group">
                                                 <label>Cantidad:</label>
-                                                <input id="txt_cantidad" name="txt_cantidad" type="text" required="true" class="col-md-2 form-control" placeholder="Ingrese cantidad" autocomplete="off" />
+                                                <input id="txt_cantidad" name="txt_cantidad" class="col-md-2 form-control" placeholder="Ingrese cantidad" 
+                                                       min="1" max="50" step="1" data-bind="value: replyNumber " type="number" data-fv-integer-message="El valor no es un numero entero." required="true"/>
                                             </div>   
 
                                         </div>    
                                         <div style="margin-top: 19px;">
-                                            <button type="button" class="btn btn-success btn-agregar-producto" id="addDetProd">Agregar</button>
+                                            <button type="button" class="btn btn-success btn-agregar-producto" id="btn_addDetProd">Agregar</button>
                                         </div>
+                                        
                                     </form>
                                 </div>
-
+                            <!--***********************SECCIÓN DETALLE DE ORDEN******************************-->
+                            
+                            <!--***********************SECCIÓN CARRITO******************************-->
                                 <div class="panel panel-info">
                                     <div class="panel-heading">
                                         <h3 class="panel-title">Productos</h3>
@@ -312,8 +349,10 @@ require_once ('../funciones/fProductos.php');
                                                         <th></th>
                                                     </tr>
                                                 </thead>
-                                                <tbody id="detalleTabla">
+                                                <tbody id="tbl_detalleOrden">
+
                                                     <?php
+                                                    $totalGlobal = 0;
                                                     if (isset($_SESSION["detalle"])) {
                                                         $datos = $_SESSION["detalle"];
                                                         for ($i = 0; $i < count($datos); $i++) {
@@ -322,51 +361,42 @@ require_once ('../funciones/fProductos.php');
                                                             echo '<td>' . $datos[$i]['cantidad'] . '</td>';
                                                             echo '<td>' . $datos[$i]['precio'] . '</td>';
                                                             echo '<td>' . $datos[$i]['cantidad'] * $datos[$i]['precio'] . '</td>';
+                                                            echo '<td>';
+                                                            echo '<a class="btn btn-danger" onclick="unsetProd(' . $i . ')">Quitar</a>';
+                                                            echo '</td>';
                                                             echo '</tr>';
+                                                            $totalGlobal += ($datos[$i]['cantidad'] * $datos[$i]['precio']);
                                                         }
+                                                        echo "<tr><td colspan=5><h2>TOTAL: $" . $totalGlobal . "</h2><input type='hidden' id='totalPre' name='totalPre' value='" . $totalGlobal . "'></td></tr>";
                                                     } else {
-                                                        echo "<div class='panel-body'>No hay productos agregados</div>";
+                                                        echo "<tr><td colspan=5>No hay productos agregados.</td></tr>";
                                                     }
                                                     ?>
                                                 </tbody>
                                             </table>
                                         </div>
-
+                                        
                                         <div class="row">
                                             <div class="col-md-12 text-right">
-                                                <button type="button" id="vaciarOrden" class="btn btn-sm btn-default guardar-carrito">Vaciar</button>
+                                                <button type="button" id="btn_vaciarOrden" class="btn btn-sm btn-default guardar-carrito">Vaciar</button>
                                                 <button type="submit" class="btn btn-sm btn-default guardar-carrito">Guardar</button>
                                             </div>
                                         </div>
                                     </form>
-
                                 </div>
+                            <!--***********************SECCIÓN CARRITO******************************-->
                             </section>
-                            <!--***********************SECCIÓN A MODIFICAR******************************-->
+                            
                         </div>
 
-
-
-
                     </div>
-
 
                 </section>
                 <!-- /.content -->
             </div>
             <!-- /.content-wrapper -->
 
-
-            <footer class="main-footer">
-                <div class="pull-right hidden-xs">
-                    <b>Sistema Web</b> Oficial
-                </div>
-                <strong>Derechos Reservados &copy; 2017-2020 <a href="http://almsaeedstudio.com">Senkali</a>.</strong> All rights
-                reserved.
-            </footer>
-
-
-
+            <?php include_once '../includes/footer.php'; ?>
 
             <div class="control-sidebar-bg"></div>
         </div>
@@ -376,53 +406,120 @@ require_once ('../funciones/fProductos.php');
 
         <script>
             $(document).ready(function () {
-                $('#addDetProd').click(function () {
-                    var estado = $('#cbo_estado').val();
-                    var codProducto = $('#cbo_producto').val();
+                $('#btn_addDetProd').click(function () {
+                    var codProducto = $('#lst_producto').val();
                     var cantidad = $('#txt_cantidad').val();
                     eval = true;
-                    if (estado === null || estado.length===0){
-                        eval = false;
-                        alert("Debe seleccionar un estado.");
-                    } 
-                    if (codProducto === null || codProducto.length===0){
+                    if (codProducto === null || codProducto.length === 0) {
                         eval = false;
                         alert("Debe seleccionar un producto");
                     }
-                    if (cantidad === null || cantidad.length===0){
+                    if (cantidad === null || cantidad.length === 0) {
                         eval = false;
                         alert("Debe ingresar la cantidad");
                     }
-                    
-                    if (eval === true){
-                        $.post("ordenHandler.php", {estado: estado, producto: codProducto, cantidad: cantidad}, function (data) {
-                        $("#detalleTabla").html(data);
-                    });
-                    } 
-                    
+
+                    if (eval === true) {
+                        $.post("ordenHandler.php", {producto: codProducto, cantidad: cantidad}, function (data) {
+                            $("#tbl_detalleOrden").html(data);
+                            var tot = $('#totalPre').val();
+                            $('#totalGlobal').attr('value', tot);
+                        });
+                    }
+
                 });
             });
         </script>
+
         <script>
             $(document).ready(function () {
-                $('#vaciarOrden').click(function () {
+                $('#btn_vaciarOrden').click(function () {
                     var vac = 1;
 
                     $.post("ordenHandler.php", {vac: vac}, function (data) {
-                        $("#detalleTabla").html(data);
+                        $("#tbl_detalleOrden").html(data);
                     });
                 });
             });
         </script>
+
+        <script>
+            function unsetProd(uns) {
+                $.post("ordenHandler.php", {uns: uns}, function (data) {
+                    $("#tbl_detalleOrden").html(data);
+                });
+            }
+        </script>
+
         <script>
             $(function () {
+                //TimePicker
+                $('.timepicker').timepicker({
+                    showInputs: false
+                });
+
                 //Date picker
-                $('#datepicker').datepicker({
+                $('#date_fechaOrd').datepicker({
                     autoclose: true
+                });
+
+                //Select2
+                $(".select2").select2();
+            });
+        </script>
+
+        <script language="javascript">
+            $(document).ready(function () {
+                $("#lst_catProd").change(function () {
+                    $("#lst_catProd option:selected").each(function () {
+                        categoria = $(this).val();
+                        $.post("../productos/subcategorias.php", {categoria: categoria}, function (data) {
+                            $("#lst_subcatProd").html(data);
+                            console.log(data);
+
+                            $("#lst_subcatProd option:selected").each(function () {
+                                subcatProd = $(this).val();
+                                $.post("productosSubCat.php", {subcatProd: subcatProd}, function (data) {
+                                    $("#lst_producto").html(data);
+                                    console.log(data);
+                                });
+                            });
+
+                        }); //Fin Post
+                    });//Fin Option
+                });//Fin Change
+            });
+        </script>
+
+        <script language="javascript">
+            $(document).ready(function () {
+                $("#lst_subcatProd").change(function () {
+                    $("#lst_subcatProd option:selected").each(function () {
+                        subcatProd = $(this).val();
+                        $.post("productosSubCat.php", {subcatProd: subcatProd}, function (data) {
+                            $("#lst_producto").html(data);
+                            console.log(data);
+                        });
+                    });
                 });
             });
         </script>
 
-
+        <script type="text/javascript">
+            function mostrarClientes() {
+                //Si la opcion con de que ES CLIENTE está activa, mostrará y obligará la selección de un cliente de la lista
+                if (document.getElementById('chk_esCliente').checked) {
+                    //muestra el div que contiene la lista de clientes
+                    document.getElementById('listadoClientes').style.display = 'initial';
+                    document.getElementById('lst_cliente').required = true;
+                    //por el contrario, si no esta seleccionada
+                } else {
+                    //oculta el div que contiene la lista de clientes
+                    document.getElementById('listadoClientes').style.display = 'none';
+                    document.getElementById('lst_cliente').required = false;
+                }
+            }
+        </script>
+        
     </body>
 </html>

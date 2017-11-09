@@ -11,15 +11,15 @@ require_once '../funciones/utils.php';
     <th></th>
 </thead>
 
-<?php
-foreach ($r as $row => $registro) {
-    ?><tr>
+<?php foreach ($r as $row => $registro) { ?>
+    <tr>
         <td><?php echo $registro["nombre_prod"]; ?></td>
         <td><?php echo $registro["subCate"]; ?></td>
         <td><?php echo $registro["precio_prod"]; ?></td>
         <td style="width:150px;">
-            <a href="../productos/editProducto.php?<?php echo encode_this('idProd='.$registro["id_productos"]); ?>" class="btn btn-sm btn-warning">Editar</a>
-        </td></tr>
+            <a href="../productos/editProducto.php?<?php echo encode_this('idProd=' . $registro["id_productos"]); ?>" class="btn btn-sm btn-warning">Editar</a>
+        </td>
+    </tr>
 <?php } ?>
 
 </table>

@@ -1,19 +1,64 @@
 <?php
 
 session_start();
-//require_once '../funciones/funcionOrd.php';
-require '../conexion/conexion.php';
-//Formateo de Fechas
-$variable = $_POST['fecha'];
-$partes = array();
-$partes = explode("/", $variable);
-$arreglo = array($partes[2], $partes[0], $partes[1]);
-$nueva_fecha = implode("-", $arreglo);
-$mesa = $_POST['mesa'];
-$emp = $_POST['emp'];
-$torden = $_POST['torden'];
-$estadoOrd = $_POST['estadoOrd'];
-$cliente = $_POST['cliente'];
+
+if (!isset($_SESSION['detalle']) || $_SESSION['detalle'] == null) {
+    print "<script>alert(\"Debe agregar productos a la Orden.\");window.location='crearOrden.php';</script>";
+} else {
+    require_once '../funciones/fOrdenes.php';
+    include_once '../conexion/conexion.php';
+
+    /* Formateo de Fechas
+      $variable = $_POST['fecha'];
+      $partes = array();
+      $partes = explode("/", $variable);
+      $arreglo = array($partes[2], $partes[0], $partes[1]);
+      $nueva_fecha = implode("-", $arreglo);
+      $mesa = $_POST['mesa'];
+      $emp = $_POST['emp'];
+      $torden = $_POST['torden'];
+      $estadoOrd = $_POST['estadoOrd'];
+      $cliente = $_POST['esCliente']; */
+
+//************NUEVA CAPTURA DE VARIABLES
+    $mesa = filter_input(INPUT_POST, 'lst_mesa');
+    $empleado = filter_input(INPUT_POST, 'lst_emp');
+    $tipoOrden = filter_input(INPUT_POST, 'lst_tipoOrd');
+    $estadoOrden = filter_input(INPUT_POST, 'lst_estOrd');
+    $fecha = filter_input(INPUT_POST, 'date_fechaOrd');
+    $hora = filter_input(INPUT_POST, 'time_horaOrd');
+    $esCliente = filter_input(INPUT_POST, 'chk_esCliente');
+    $idCliente = filter_input(INPUT_POST, 'lst_cliente');
+    $totalGlobal = filter_input(INPUT_POST, 'totalGlobal');
+
+    $fechaHora = date_format(date_create($fecha . ' ' . $hora), 'Y-m-d H:i:s'); //Fecha formateada MySQL
+    /* Se va a crear una página donde agregar mas productos a una Orden, este va a ser el filtro para determinar si una Orden se registra
+     * por primera vez o si se van a agregar productos a una Orden ya Existente
+     */
+    $idOrden = filter_input(INPUT_POST, 'idOrden');
+
+    if (!isset($esCliente) || $esCliente == null) {
+        $idCliente = 0;
+        $esCliente = FALSE;
+    }
+
+    if (!isset($idOrden)) {
+        $codigoOrden = registrarOrdenCompleta($mesa, $empleado, $tipoOrden, $fechaHora, $totalGlobal, $esCliente, $idCliente);
+        print "<script>alert(\"ORDEN REGISTRADA CON CODIGO: " . $codigoOrden . "\");window.location='crearOrden.php';</script>";
+    } else {
+        
+    }
+}
+
+
+
+
+
+
+
+
+
+/*
 
 
 $lastId = 0;

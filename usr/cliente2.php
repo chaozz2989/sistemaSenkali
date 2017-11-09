@@ -43,7 +43,7 @@ if(!isset($_SESSION["cliente_id"]) || $_SESSION["cliente_id"]==null){
         <div class="wrapper">
 
             <?php
-            require ('../includes/head_menu_Cliente.php');
+            require ('../includes/head_menu.php');
             ?>
             <!-- Left side column. contains the logo and sidebar -->
 

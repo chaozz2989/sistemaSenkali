@@ -8,7 +8,7 @@ class reporte {
         # code...
     }
 
-    public function obtener_cliente25($nombre = '', $dui = '', $estado = '') {
+    /*public function obtener_cliente25($nombre = '', $dui = '', $estado = '') {
         $condicion = "";
         $html = "";
         $value = trim($value);
@@ -34,7 +34,7 @@ class reporte {
         }
         Database::disconnect();
         return $html;
-    }
+    }*/
 
     public function obtener_empleado($value = '') {
         $condicion = "";

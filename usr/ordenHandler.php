@@ -1,24 +1,40 @@
 <?php
 
-
-
 session_start();
 /* if (!isset($_SESSION['idUsuario'])) {
   echo "<script type='text/javascript'>"
   . "window.location = '../login.php';"
   . "</script>";
   } */
-include_once "../funciones/fOrdenes.php";
-include_once  '../conexion/conexion.php';
 
+require '../conexion/conexion.php';
 $codigoProducto = filter_input(INPUT_POST, 'producto');
 $cantidad = filter_input(INPUT_POST, 'cantidad');
-$estado = 1;//filter_input(INPUT_POST, 'estado');    *********El estado ya no se manda a llamar porque al agregar productos siempre estarán pendientes.
+$estado = filter_input(INPUT_POST, 'estado');
 $vaciado = filter_input(INPUT_POST, 'vac');
-$idDetalleAtendido = filter_input(INPUT_POST, 'estadoDetalleAtendido'); // Se utiliza para cambiar el estado del producto a ATENDIDO
-$idDetalleCancelado = filter_input(INPUT_POST, 'estadoDetalleCancelado'); // Se utiliza para cambiar el estado del producto a CANCELADO
 
-$idOrden = filter_input(INPUT_POST, 'idOrden');  //Se utiliza para cambiar el estado del producto a ATENDIDO
+function encode_this($string) {
+    $string = utf8_encode($string);
+    $control = "qwerty"; //defino la llave para encriptar la cadena, cambiarla por la que deseamos usar
+    $string = $control . $string . $control; //concateno la llave para encriptar la cadena
+    $string = base64_encode($string); //codifico la cadena
+    return($string);
+}
+
+/*
+  if (!empty($_POST)) {
+  $fechaCompraGlobal = $_POST['fechaCompraGlobal'];
+  $total = $_POST['totalGlobal'];
+  $valid = true;
+  if (empty($fechaCompraGlobal)) {
+  $fechaCompraGlobalError = "Ingrese la fecha de compra";
+  $valid = false;
+  }
+
+  if ($valid){
+  header("Location: comprarTodo.php?". encode_this('fecha='. $fechaCompraGlobal . '&total=' . $total));
+  }
+  } */
 
 if (isset($vaciado)) {
     if ($vaciado == 1) {
@@ -32,16 +48,7 @@ if (isset($_REQUEST['uns'])) {
     $arreglo = $_SESSION["detalle"];
     unset($arreglo[$idArr]);
     $_SESSION["detalle"] = array_values($arreglo);
-    //print "<script>window.location='crearOrden.php';</script>";
 }
-
-if (isset($idDetalleAtendido)){ //esta funcion cambia el estado del producto cuando ya ha sido atendido
-    $cambioEstado = updateEstadoProducto($idDetalleAtendido, 2);
-    if ($cambioEstado){
-        echo getHtmlDetalleOrden($idOrden);
-    }
-}
-
 
 
 if (isset($_SESSION["detalle"])) { //Manejo del carrito de productos de la orden, este se utiliza cuando ya existe algo en el carrito
@@ -123,23 +130,24 @@ if (isset($_SESSION["detalle"])) {
     $condicion = "";
     $html = "";
     $datos = $_SESSION["detalle"];
-    $totalGlobal = 0;
     for ($i = 0; $i < count($datos); $i++) {
         echo '<tr>';
         echo '<td>' . $datos[$i]['producto'] . '</td>';
         echo '<td>' . $datos[$i]['cantidad'] . '</td>';
         echo '<td>' . $datos[$i]['precio'] . '</td>';
         echo '<td>' . $datos[$i]['cantidad'] * $datos[$i]['precio'] . '</td>';
-        echo '<td>';
-        echo '<a class="btn btn-danger" onclick="unsetProd(' . $i . ')">Quitar</a>';
-        echo '</td>';
         echo '</tr>';
-        $totalGlobal += ($datos[$i]['cantidad'] * $datos[$i]['precio']);
     }
-    echo "<tr><td colspan=5><h2>TOTAL: $" . $totalGlobal . "</h2><input type='hidden' id='totalPre' name='totalPre' value='" . $totalGlobal . "'></td></tr>";
-} else {
-    echo "<tr><td colspan=5>No hay productos agregados.</td></tr>";
+
+
+/*
+    foreach ($pdo as $indice => $row) {
+        $html .= '<tr>';
+        $html .= '<td>' . $row['producto'] . '</td>';
+        $html .= '<td>' . $row['cantidad'] . '</td>';
+        $html .= '<td>' . $row['precio'] . '</td>';
+        $html .= '<td>' . $row['cantidad'] * $row['precio'] . '</td>';
+    }
+    echo $html;*/
 }
-
-
 ?>

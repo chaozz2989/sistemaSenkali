@@ -194,7 +194,7 @@ $html = $cliente->obtener_cliente();
                 $(".select2").select2();
 
                 $('#example1').DataTable({
-                    "paging": false,
+                    "paging": true,
                     "lengthChange": true,
                     "searching": false,
                     "ordering": true,

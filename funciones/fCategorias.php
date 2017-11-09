@@ -53,7 +53,6 @@ function modificarCategoria($idCategoria, $nombreCategoria){
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $sql = "UPDATE categorias SET nombre=? WHERE id_categoria=?;";
-    
         $q = $pdo->prepare($sql);
         $q->execute(array($nombreCategoria, $idCategoria));
         Database::disconnect();
@@ -93,8 +92,25 @@ function getCategorias() {
         $resultado = $q->fetchAll();
         Database::disconnect();
     } catch (PDOException $e) {
-        echo "Error al ejecutar la sentencia: \n";
-        print_r($e->getMessage());
+        $resultado = false;
+        write_log($e, "getCategorias");
+    }
+    return $resultado;
+}
+
+function getSubCategorias() {
+    $resultado = null;
+    $pdo = Database::connect();
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $sql = "SELECT * FROM subcategorias";
+    try {
+        $q = $pdo->prepare($sql);
+        $q->execute();
+        $resultado = $q->fetchAll();
+        Database::disconnect();
+    } catch (PDOException $e) {
+        $resultado = false;
+        write_log($e, "getSubcategorias");
     }
     return $resultado;
 }

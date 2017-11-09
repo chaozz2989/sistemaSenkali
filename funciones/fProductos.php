@@ -73,7 +73,7 @@ function getListadoProductoPorTipos($tipoProducto){
     $resultado = null;
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $sql = "SELECT * FROM productos WHERE id_subCat =: tipoProducto";
+    $sql = "SELECT * FROM productos WHERE id_subCat = " . $tipoProducto;
     try {
         $q = $pdo->prepare($sql);
         $q->execute();

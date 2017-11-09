@@ -207,14 +207,11 @@ require '../funciones/fCategorias.php';
                         categoria=$(this).val();
                         $.post("subcategorias.php", { categoria: categoria }, function(data){
                         $("#subcatProd").html(data);
-                        });            
+                        });
                     });
                });
             });
         </script>
-
-
-
 
     </body>
 </html>

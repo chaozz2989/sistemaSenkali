@@ -143,9 +143,6 @@ function actualizarReserva($descripcion, $codReserva, $idReserva, $idEstadoRes) 
 
 //FUNCION DE CATEGORIAS Y SUBCATEGORIAS
 
-
-
-
 function getMesas() {
     $resultado = null;
     $pdo = Database::connect();
@@ -179,7 +176,7 @@ function getEmpleados() {
     }
     return $resultado;
 }
-
+/*
 function getTiposOrden() {
     $resultado = null;
     $pdo = Database::connect();
@@ -230,7 +227,7 @@ function getOrdenes(){
     }
     return $resultado;
 }
-
+*/
  function comboEstadoUsuario(){
     $resultado = null;
     $pdo = Database::connect();
