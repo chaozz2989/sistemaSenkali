@@ -109,17 +109,20 @@ function getEstadosOrden() {
 
 /*
  * Selecciona:
- * Código de Orden
- * Fecha y Hora de Pedido
- * Estado
- * Nombre del cliente (si tiene)
+ * 0 - Código de Orden
+ * 1 - Fecha y Hora de Pedido
+ * 2 - Estado
+ * 3 - Nombre del cliente (si tiene)
+ * 4 - Codigo de Mesa
+ * 5 - Total de la Orden
  */
 
 function getInfoOrdenesPorId($idOrden) {
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $sql = "SELECT co.codigo_orden, o.fecha_hora, eo.estado, c.nombre FROM ordenes AS o " .
+    $sql = "SELECT co.codigo_orden, o.fecha_hora, eo.estado, c.nombre, m.cod_mesa, o.total_orden FROM ordenes AS o " .
             "INNER JOIN codigo_orden co ON co.id_orden = o.id_ordenes " .
+            "INNER JOIN mesas m ON m.id_mesa = o.id_mesa " .
             "INNER JOIN estados_orden eo ON eo.id_estadosOrden = o.id_estadoOrden " .
             "LEFT JOIN detalle_consumo_cliente dcc ON dcc.id_orden = o.id_ordenes " .
             "LEFT JOIN clientes c ON c.id_clientes = dcc.id_cliente " .
@@ -131,7 +134,7 @@ function getInfoOrdenesPorId($idOrden) {
         Database::disconnect();
     } catch (PDOException $e) {
         $resultado = 'Ocurrio un problema';
-        write_log($ex, "getInfoOrdenes");
+        write_log($e, "getInfoOrdenes");
     }
     return $resultado;
 }
@@ -148,7 +151,7 @@ function getTiposOrden() {
         Database::disconnect();
     } catch (PDOException $e) {
         $resultado = 'Ocurrio un problema';
-        write_log($ex, "getTiposOrden");
+        write_log($e, "getTiposOrden");
     }
     return $resultado;
 }
@@ -169,7 +172,7 @@ function getCodigoOrden($idOrden, $idMesa, $idEmpleado) {
         $q->execute();
         $noOrdenDia = count($q->fetchAll());
         Database::disconnect();
-    } catch (PDOException $e) {
+    } catch (PDOException $ex) {
         $noOrdenDia = 'Ocurrio un problema';
         write_log($ex, "getCodigoOrden");
     }
@@ -225,13 +228,21 @@ function getListadoOrdenes($pendientes = FALSE) {
         $q->execute();
         $resultado = $q->fetchAll();
         Database::disconnect();
-    } catch (PDOException $e) {
+    } catch (PDOException $ex) {
         $resultado = 'Ocurrio un problema';
         write_log($ex, "getListadoOrdenes");
     }
     return $resultado;
 }
 
+/*
+ * Obtiene la siguiente información:
+ * 0 - ID del detalle de la Orden
+ * 1 - Nombre del Producto
+ * 2 - Cantidad del Producto
+ * 3 - Subtotal de la Orden
+ * 4 - Estado del Producto
+ */
 function getDetalleOrdenPorId($idOrden) {
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -261,9 +272,13 @@ function getHtmlDetalleOrden($idOrden) {
             $html .= '<td>' . $row['nombre_prod'] . '</td>';
             $html .= '<td>' . $row['cantidad_prod'] . '</td>';
             $html .= '<td>' . $row['estado'] . '</td>';
-            $html .= '<td>' . $row['subtotal_orden'] . '</td>';
-            if ($row['estado'] == "Atendida") {
-                $html .= '<td></td>';
+            if ($row['estado']=="Cancelada"){
+                $html .= '<td>-' . $row['subtotal_orden'] . '</td>';
+            }else{
+                $html .= '<td>' . $row['subtotal_orden'] . '</td>';
+            }
+            if ($row['estado'] == "Atendida" || ($row['estado'] == "Cancelada")) {
+                $html .= '';
             } else {
                 $html .= '<td> <a class="btn btn-info" onclick="detalleAtendido(' . $row["id_detOrden"] . ')">Atendido</a></td>';
                 $html .= '<td> <a class="btn btn-info" onclick="detalleCancelado(' . $row["id_detOrden"] . ')">Cancelar</a></td>';
@@ -280,7 +295,9 @@ function getHtmlDetalleOrden($idOrden) {
 }
 
 /*
- * Estados posibles de los productos: Pendiente-1; Atendido-2; Cancelado-3;
+ * 
+ * @$idDetalleProducto
+ * @alEstado indica uno de 3 posibles estados: Pendiente-1; Atendido-2; Cancelado-4
  */
 function updateEstadoProducto($idDetalleProducto, $alEstado) {
     $pdo = Database::connect();
@@ -303,10 +320,10 @@ function updateEstadoProducto($idDetalleProducto, $alEstado) {
  * -checkEstadoDetalleOrden
  * -
  */
-
 function checkEstadoDetalleOrden($idOrden) {
     $listado = listadoEstadoDetalleOrden($idOrden);
     $todoAtendido = TRUE;
+    $resultado = FALSE;
     try {
         foreach ($listado as $row => $dato) {//Evalua que el estado de cada item de la orden se haya atendido.
             if ($dato['id_estado_detalleOrd'] == 1) {
@@ -314,7 +331,12 @@ function checkEstadoDetalleOrden($idOrden) {
             }
         }
         if ($todoAtendido) {
-            updateEstadoOrden($idOrden); //Si todo esta atendido, cambia el estado de la orden.
+            if (checkTodoCancelado($idOrden)){
+                $resultado = updateEstadoOrden($idOrden, 4); //Si todo esta CANCELADA, cambia el estado de la orden a CANCELADA.
+            } else{
+                $resultado = updateEstadoOrden($idOrden, 2); //Si todo esta ATENDIDO, cambia el estado de la orden a ATENDIDA.
+            }
+            
         }
     } catch (PDOException $e) {
         $resultado = FALSE;
@@ -322,6 +344,23 @@ function checkEstadoDetalleOrden($idOrden) {
     }
     return $resultado;
 }
+
+/*
+ * Esta función se encarga de verificar si todos los productos se catalogan como CANCELADOS, 
+ * de ser así, el estado de la orden debe cambiar a CANCELADA.
+ */
+function checkTodoCancelado($idOrden) {
+    $listadoCancelado = listadoEstadoDetalleOrden($idOrden);
+    $todoCancelado = TRUE;
+    foreach ($listadoCancelado as $row => $dato) {//Evalua que el estado de cada item de la orden se haya atendido.
+        if ($dato['id_estado_detalleOrd'] != 4) {
+            $todoCancelado = FALSE;
+        }
+    }
+    return $todoCancelado;
+}
+
+
 
 function listadoEstadoDetalleOrden($idOrden) {
     $pdo = Database::connect();
@@ -346,25 +385,43 @@ function listadoEstadoDetalleOrden($idOrden) {
 function updateEstadoOrden($idOrden, $alEstado) { //la variable $alEstado determina por defecto que se cambiara al estado Atendi
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    switch ($alEstado) {
-        case 1:
-            $sql = "UPDATE ordenes SET id_estadoOrden=1 WHERE id_ordenes=?";
-        case 2:
-            $sql = "UPDATE ordenes SET id_estadoOrden=2 WHERE id_ordenes=?";
-        case 3:
-            $sql = "UPDATE ordenes SET id_estadoOrden=3 WHERE id_ordenes=?";
-        case 4:
-            $sql = "UPDATE ordenes SET id_estadoOrden=4 WHERE id_ordenes=?";
-    }
+    $sql = "UPDATE ordenes SET id_estadoOrden=? WHERE id_ordenes=?";
 
     try {
         $q = $pdo->prepare($sql);
-        $q->execute(array($idOrden));
+        $q->execute(array($alEstado, $idOrden));
         Database::disconnect();
         $resultado = TRUE;
     } catch (PDOException $e) {
         $resultado = FALSE;
-        write_log($e, "updateEstadoProducto");
+        write_log($e, "updateEstadoOrden");
+    }
+    return $resultado;
+}
+
+function descontarCancelados($idOrden){
+    $detallesOrden = getDetalleOrdenPorId($idOrden);
+    $nuevaCuenta = 0; 
+    $descuento = 0;
+    foreach ($detallesOrden as $row => $dato) {              //Se recorre el arreglo para obtener el monto a descontar.
+        $nuevaCuenta += $dato[3]; 
+        if ($dato[4] == 'Cancelada') {
+            $descuento += $dato[3];
+        }
+    }
+    $nuevoTotal = $nuevaCuenta - $descuento;
+    $pdo = Database::connect();
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $sql = "UPDATE ordenes SET total_orden=? WHERE id_ordenes=?";
+
+    try {
+        $q = $pdo->prepare($sql);
+        $q->execute(array($nuevoTotal, $idOrden));
+        Database::disconnect();
+        $resultado = TRUE;
+    } catch (PDOException $e) {
+        $resultado = FALSE;
+        write_log($e, "descontarCancelados");
     }
     return $resultado;
 }

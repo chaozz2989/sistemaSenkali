@@ -10,6 +10,7 @@ session_start();
   } */
 include_once "../funciones/fOrdenes.php";
 include_once  '../conexion/conexion.php';
+include_once '../funciones/utils.php';
 
 $codigoProducto = filter_input(INPUT_POST, 'producto');
 $cantidad = filter_input(INPUT_POST, 'cantidad');
@@ -37,11 +38,32 @@ if (isset($_REQUEST['uns'])) {
 
 if (isset($idDetalleAtendido)){ //esta funcion cambia el estado del producto cuando ya ha sido atendido
     $cambioEstado = updateEstadoProducto($idDetalleAtendido, 2);
-    if ($cambioEstado){
+    $cambiarEstado = checkEstadoDetalleOrden($idOrden);
+    if (!$cambiarEstado){
         echo getHtmlDetalleOrden($idOrden);
+        exit();
+    } else {
+        echo getHtmlDetalleOrden($idOrden);
+        print "<script>$('#encabezadoOrden' ).load(window.location.href + ' #encabezadoOrden' ); $('#divRecibo' ).load(window.location.href + ' #divRecibo' );</script>";
+        
+        exit();
     }
 }
 
+if (isset($idDetalleCancelado)){ //esta funcion cambia el estado del producto cuando este se cancela (osea que ya no lo quieren pues)
+    $cambioEstado = updateEstadoProducto($idDetalleCancelado, 4); //Cambia el estado del producto a CANCELADA
+    $cambiarEstado = checkEstadoDetalleOrden($idOrden); //Verifica si debe cambiar el estado a la ORDEN
+    $descuento  = descontarCancelados($idOrden);
+    if (!$cambiarEstado){
+        echo getHtmlDetalleOrden($idOrden);
+        print "<script>$('#div_TotalPago' ).load(window.location.href + ' #div_TotalPago' );</script>";
+        exit();
+    } else {
+        echo getHtmlDetalleOrden($idOrden);
+        print "<script>$('#encabezadoOrden' ).load(window.location.href + ' #encabezadoOrden' ); $('#div_TotalPago' ).load(window.location.href + ' #div_TotalPago' );</script>";
+        exit();
+    }
+}
 
 
 if (isset($_SESSION["detalle"])) { //Manejo del carrito de productos de la orden, este se utiliza cuando ya existe algo en el carrito

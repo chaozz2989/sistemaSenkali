@@ -113,18 +113,32 @@ $html = getHtmlDetalleOrden($idOrden);
                                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
                             </div>
                         </div>
-                        <div class="box-body">
+                        <div id="encabezadoOrden" class="box-body">
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <h4 class="box-title">Cliente: <strong><?php
                                             if ($infoOrden[0][3] == null): echo 'NA';
                                             else: echo $infoOrden[0][3];
                                             endif;
-                                            ?></strong></h4>
+                                            ?></strong>
+                                    </h4>
+                                </div>
+                                <div class="col-md-6">
+                                    <h4 class="box-title">Mesa: <strong><?php echo $infoOrden[0][4]; ?></strong></h4>
                                 </div>
                                 <!-- /.col -->
                                 <div class="col-md-6">
-                                    <h4 class="box-title">Estado: <strong><?php echo $infoOrden[0][2]; ?></strong></h4>
+                                    <h4 class="box-title">Estado: <strong>
+                                            <?php if ($infoOrden[0][2] == 'Pendiente'){
+                                                echo "<span class='label label-warning'>" . $infoOrden[0][2] . "</span>";
+                                            }elseif ($infoOrden[0][2] == 'Atendida') {
+                                                echo "<span class='label label-success'>" . $infoOrden[0][2] . "</span>";
+                                            }elseif ($infoOrden[0][2] == 'Cancelada') {
+                                                echo "<span class='label label-danger'>" . $infoOrden[0][2] . "</span>";
+                                            }
+                                                 ?>
+                                        </strong>
+                                    </h4>
                                 </div>
                                 <!-- /.col -->
                                 <div class="col-md-6">
@@ -141,7 +155,15 @@ $html = getHtmlDetalleOrden($idOrden);
                             <h2 class="box-title">Detalle</h2>
                         </div>
                         <div class="box-body">
-                            <input type="submit" href="pdf/reporteCliente.php" class="btn btn-danger" value="Imprimir Reporte">
+                            <div id="divRecibo">
+                                <?php if($infoOrden[0][2] == 'Atendida' || $infoOrden[0][2] == 'Pendiente'){ ?>
+                               <input id="addProducto" type="button"  class="btn btn-info" value="Agregar Productos">
+                            <?php echo ""; }?>
+                                
+                            <?php if($infoOrden[0][2] == 'Atendida'){ ?>
+                                <input id="btn_generarRecibo" type="button" onclick="generarRecibo()" class="btn btn-success" value="Generar Recibo">
+                            <?php echo ""; }?>
+                            </div>
                             <table id="example1" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
@@ -167,7 +189,9 @@ $html = getHtmlDetalleOrden($idOrden);
                                     </tr>
                                 </tfoot>
                             </table>
-
+                            <div id="div_TotalPago">
+                                <h2>TOTAL A PAGAR: <strong>$<?php echo $infoOrden[0][5]; ?></strong></h2>
+                            </div>
                         </div>
                     </div>
 <button type="button" name="return" class="btn btn-default" onclick="history.back()">Regresar</button>
@@ -184,16 +208,45 @@ $html = getHtmlDetalleOrden($idOrden);
 
         <script>
             function detalleAtendido(idDetalleOrd) {
-                var idOrden = "<?php echo $idOrden;?>";
+                var idOrden = "<?php echo $idOrden; ?>";
                 $.post("ordenHandler.php", {estadoDetalleAtendido: idDetalleOrd, idOrden:idOrden}, function (data) {
                     $("#tbl_detalleOrden").html(data);
+                    
                 });
             }
             function detalleCancelado(idDetalleOrd) {
-                var idOrden = "<?php echo $idOrden;?>";
-                $.post("ordenHandler.php", {cambioEstadoDetalleOrd: idDetalleOrd, idOrden:idOrden}, function (data) {
+                var idOrden = "<?php echo $idOrden; ?>";
+                $.post("ordenHandler.php", {estadoDetalleCancelado: idDetalleOrd, idOrden:idOrden}, function (data) {
                     $("#tbl_detalleOrden").html(data);
                 });
+            }
+            
+            
+function redirect_by_post(purl, pparameters, in_new_tab) {
+    pparameters = (typeof pparameters == 'undefined') ? {} : pparameters;
+    in_new_tab = (typeof in_new_tab == 'undefined') ? true : in_new_tab;
+
+    var form = document.createElement("form");
+    $(form).attr("id", "reg-form").attr("name", "reg-form").attr("action", purl).attr("method", "post").attr("enctype", "multipart/form-data");
+    if (in_new_tab) {
+        $(form).attr("target", "_blank");
+    }
+    $.each(pparameters, function(key) {
+        $(form).append('<input type="text" name="' + key + '" value="' + this + '" />');
+    });
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+
+    return false;
+}
+
+            function generarRecibo(){
+                var idOrden = "<?php echo $idOrden; ?>";
+                redirect_by_post('../ordenes/impresionDetOrden.php', {
+                    idOrden: idOrden
+                }, true);
+
             }
         </script>
 
