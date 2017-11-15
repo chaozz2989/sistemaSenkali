@@ -68,7 +68,7 @@ function registrarDetalleOrden($idOrden) {//SECUENCIA PARA INGRESAR EL DETALLE D
         Database::disconnect();
     } catch (Exception $ex) {
         $resultado = false;
-        write_log($ex, "registrarProducto");
+        write_log($ex, "registrarDetalleOrden");
     }
     return $resultado;
 }
@@ -85,7 +85,7 @@ function registrarSiEsCliente($idCliente, $idOrden) {
         $resultado = true;
     } catch (PDOException $e) {
         $resultado = false;
-        write_log($e, "registrrSiEsCliente");
+        write_log($e, "registrarSiEsCliente");
     }
     return $resultado;
 }
@@ -115,12 +115,13 @@ function getEstadosOrden() {
  * 3 - Nombre del cliente (si tiene)
  * 4 - Codigo de Mesa
  * 5 - Total de la Orden
+ * 6 - Id del Cliente
  */
 
 function getInfoOrdenesPorId($idOrden) {
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $sql = "SELECT co.codigo_orden, o.fecha_hora, eo.estado, c.nombre, m.cod_mesa, o.total_orden FROM ordenes AS o " .
+    $sql = "SELECT co.codigo_orden, o.fecha_hora, eo.estado, c.nombre, m.cod_mesa, o.total_orden, c.id_clientes FROM ordenes AS o " .
             "INNER JOIN codigo_orden co ON co.id_orden = o.id_ordenes " .
             "INNER JOIN mesas m ON m.id_mesa = o.id_mesa " .
             "INNER JOIN estados_orden eo ON eo.id_estadosOrden = o.id_estadoOrden " .
@@ -285,7 +286,6 @@ function getHtmlDetalleOrden($idOrden) {
             }
             $html .= '</tr>';
         }
-        Database::disconnect();
     } catch (Exception $ex) {
         $html = "Ocurrio un problema al obtener el Detalle.";
         write_log($ex, "getHtmlDetalleOrden");
@@ -399,17 +399,8 @@ function updateEstadoOrden($idOrden, $alEstado) { //la variable $alEstado determ
     return $resultado;
 }
 
-function descontarCancelados($idOrden){
-    $detallesOrden = getDetalleOrdenPorId($idOrden);
-    $nuevaCuenta = 0; 
-    $descuento = 0;
-    foreach ($detallesOrden as $row => $dato) {              //Se recorre el arreglo para obtener el monto a descontar.
-        $nuevaCuenta += $dato[3]; 
-        if ($dato[4] == 'Cancelada') {
-            $descuento += $dato[3];
-        }
-    }
-    $nuevoTotal = $nuevaCuenta - $descuento;
+function updateTotalOrden($idOrden){
+    $nuevoTotal = recalcularTotalOrden($idOrden);
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $sql = "UPDATE ordenes SET total_orden=? WHERE id_ordenes=?";
@@ -424,4 +415,56 @@ function descontarCancelados($idOrden){
         write_log($e, "descontarCancelados");
     }
     return $resultado;
+}
+
+function recalcularTotalOrden($idOrden){
+    $detallesOrden = getDetalleOrdenPorId($idOrden);
+    $nuevaCuenta = 0; 
+    $descuento = 0;
+    foreach ($detallesOrden as $row => $dato) {              //Se recorre el arreglo para obtener el monto a descontar.
+        $nuevaCuenta += $dato[3]; 
+        if ($dato[4] == 'Cancelada') {
+            $descuento += $dato[3];
+        }
+    }
+    $nuevoTotal = $nuevaCuenta - $descuento;
+    
+    return $nuevoTotal;
+}
+
+function getOrdenesAtendidas() {
+    $pdo = Database::connect();
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $sql = "SELECT o.id_ordenes, co.codigo_orden, cm.cod_mesa, c.nombre, c.apellido, o.total_orden, es.estado FROM ordenes o " .
+            "INNER JOIN codigo_orden co ON co.id_orden = o.id_ordenes " .
+            "INNER JOIN mesas cm ON cm.id_mesa = o.id_mesa " .
+            "LEFT JOIN detalle_consumo_cliente dcc ON dcc.id_orden = o.id_ordenes ".
+            "LEFT JOIN clientes c ON c.id_clientes = dcc.id_cliente " .
+            "LEFT JOIN estados_orden es ON es.id_estadosOrden = o.id_estadoOrden " .
+            "WHERE es.estado = 'Atendida'";
+    try {
+        $q = $pdo->prepare($sql);
+        $q->execute();
+        $resultado = $q->fetchAll();
+        Database::disconnect();
+    } catch (PDOException $ex) {
+        $resultado = 'Ocurrio un problema';
+        write_log($ex, "getOrdenesAtendidas");
+    }
+    return $resultado;
+}
+
+function getHtmlOrdenAtendida() {    include_once 'utils.php';
+    $detalle = getOrdenesAtendidas();
+    $html = '';
+    foreach ($detalle as $registro => $row) {
+        $html .= '<tr>';
+        $html .= '<td>' . $row['codigo_orden'] . '</td>';
+        $html .= '<td>' . $row['cod_mesa'] . '</td>';
+        $html .= '<td>' . $row['nombre'] . ' ' . $row['apellido'] . '</td>';
+        $html .= '<td> $' . $row['total_orden'] . '</td>';
+        $html .= '<td> <a href="../pagos/pagarOrden.php?' . encode_this('idOrdenAPagar=' . $row["id_ordenes"]) . '" class="btn btn-info")">Pagar</a></td>';
+        $html .= '</tr>';
+    }
+    return $html;
 }

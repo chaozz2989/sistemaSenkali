@@ -245,4 +245,21 @@ function getOrdenes(){
     return $resultado;
 }
 
+function getclientesPorId($param) { 
+    $resultado = null;
+    $pdo = Database::connect();
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $sql = "select r.id_clientes, r.nombre, r.apellido, e.id_clientes from clientes r INNER JOIN monedero e ON e.id_clientes = r.id_clientes = $param";
+    try {
+        $q = $pdo->prepare($sql);
+        $q->execute();
+        $resultado = $q->fetchAll();
+        Database::disconnect();
+    } catch (PDOException $e) {
+        echo "Error al ejecutar la sentencia: \n";
+        print_r($e->getMessage());
+    }
+    return $resultado;  
+}
+
 ?>

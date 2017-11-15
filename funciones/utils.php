@@ -28,4 +28,23 @@ function decode_get2($string) {
     return $SA;
 }
 
+function numeroRecibo($idComprobante) {
+
+    if ($idComprobante < 10) {
+        $recibo = '00000' . $idComprobante;
+    } elseif ($idComprobante > 10 && $idComprobante < 100) {
+        $recibo = '0000' . $idComprobante;
+    } elseif ($idComprobante > 100 && $idComprobante < 1000){
+        $recibo = '000' . $idComprobante;
+    } elseif ($idComprobante > 1000 && $idComprobante < 10000){
+        $recibo = '00' . $idComprobante;
+    } elseif ($idComprobante > 10000 && $idComprobante < 100000){
+        $recibo = '0' . $idComprobante;
+    } else{
+        $recibo = $recibo;
+    }
+
+    return $recibo;
+}
+
 ?>

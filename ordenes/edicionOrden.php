@@ -156,9 +156,36 @@ $html = getHtmlDetalleOrden($idOrden);
                         </div>
                         <div class="box-body">
                             <div id="divRecibo">
+                                
                                 <?php if($infoOrden[0][2] == 'Atendida' || $infoOrden[0][2] == 'Pendiente'){ ?>
-                               <input id="addProducto" type="button"  class="btn btn-info" value="Agregar Productos">
+                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal">Agregar Productos</button>
+                               
                             <?php echo ""; }?>
+                                
+                                <!--Contenido del MODAL para agregar mas productos a la orden-->
+                                <div id="myModal" class="modal fade" role="dialog">
+                                <div class="modal-dialog">
+
+                                    <!-- Modal content-->
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <h4 class="modal-title">Ordenes Pendientes</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <?php
+                                            //Table
+                                            require_once('../ordenes/listadoAddProductos.php');
+                                            ?>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div> 
+                                
                                 
                             <?php if($infoOrden[0][2] == 'Atendida'){ ?>
                                 <input id="btn_generarRecibo" type="button" onclick="generarRecibo()" class="btn btn-success" value="Generar Recibo">
@@ -246,7 +273,6 @@ function redirect_by_post(purl, pparameters, in_new_tab) {
                 redirect_by_post('../ordenes/impresionDetOrden.php', {
                     idOrden: idOrden
                 }, true);
-
             }
         </script>
 

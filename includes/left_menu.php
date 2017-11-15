@@ -87,9 +87,26 @@
                     </a>
                     <ul class="treeview-menu">
                         <li><a href="../ordenes/crearOrden.php"><i class="fa fa-circle-o"></i> Nueva Orden</a></li>
-                        <li><a href="#"><i class="fa fa-circle-o"></i> Nuevo Tipo de Evento</a></li>
+                        <li><a href="../pagos/listadoOrdenesPago.php"><i class="fa fa-circle-o"></i> Pagar Orden</a></li>
                         <li><a href="#"><i class="fa fa-circle-o"></i> Modificar Reservacion</a></li>
                         <li><a href="#"><i class="fa fa-circle-o"></i> Modificar Tipo de Evento</a></li>
+                    </ul>
+                </li>
+            <?php } ?>
+
+            <?php if ($_SESSION['idRol'] == 1) { ?>
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-files-o"></i>
+                        <span>Monedero</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li><a href="../monedero/monedero.php"><i class="fa fa-circle-o"></i> Monedero</a></li>
+
+
                     </ul>
                 </li>
             <?php } ?>

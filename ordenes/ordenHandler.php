@@ -53,7 +53,7 @@ if (isset($idDetalleAtendido)){ //esta funcion cambia el estado del producto cua
 if (isset($idDetalleCancelado)){ //esta funcion cambia el estado del producto cuando este se cancela (osea que ya no lo quieren pues)
     $cambioEstado = updateEstadoProducto($idDetalleCancelado, 4); //Cambia el estado del producto a CANCELADA
     $cambiarEstado = checkEstadoDetalleOrden($idOrden); //Verifica si debe cambiar el estado a la ORDEN
-    $descuento  = descontarCancelados($idOrden);
+    $descuento  = updateTotalOrden($idOrden);
     if (!$cambiarEstado){
         echo getHtmlDetalleOrden($idOrden);
         print "<script>$('#div_TotalPago' ).load(window.location.href + ' #div_TotalPago' );</script>";

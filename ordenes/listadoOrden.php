@@ -3,25 +3,6 @@ $lstOrden = getListadoOrdenes(TRUE);
 require_once '../funciones/utils.php';
 ?>
 
-<!--
-<script>
-    $(document).on('ready', function () {
-        $('#btn-ingresar').click(function () {
-            var url = "../ordenes/edicionOrden.php";
-            $.ajax({
-                type: "POST",
-                url: url,
-                data: $("#form").serialize(),
-                success: function (data)
-                {
-                    $('#resp').html(data);
-                }
-            });
-        });
-    });
-</script>
--->
-
 <table class="table">
     <thead>
     <th class="danger" >Codigo de Orden</th>
@@ -37,12 +18,6 @@ require_once '../funciones/utils.php';
         <td style="width:150px;">
             <a href="../ordenes/edicionOrden.php?<?php echo encode_this('idOr=' . $registro["id_ordenes"]); ?>" class="btn btn-info">Ver Orden</a>
         </td>
-        <!--<td class="info">
-            <form method="post" id="form" >
-                <input type="hidden" name="idOr" id="idOr" value="<?php $registro['id_ordenes']; ?>" />
-                <button type="button" id="btn-ingresar" class="btn btn-info">Ver Orden</button>
-            </form>
-        </td>-->
     </tr>
 <?php } ?>
 
