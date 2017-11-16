@@ -33,7 +33,7 @@ $valor = "";
 $html = '<html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Recibo de Orden</title>
+    <title>Precuenta de Orden</title>
     <link rel="stylesheet" href="../reportes/pdf/estilo_reporte.css" media="all" />
   </head>
   <body>
@@ -41,7 +41,7 @@ $html = '<html lang="en">
       <div id="logo">
         <img src="../reportes/pdf/logo1SNK.jpg" width="100px">
       </div>
-      <h1>Recibo de Orden ' .  $encabezado[0][0] . '</h1>
+      <h1>Precuenta de Orden ' .  $encabezado[0][0] . '</h1>
       <div id="company" class="clearfix">
         <div>' . $nombre_institucion . '</div>        
       </div>

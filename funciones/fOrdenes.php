@@ -244,6 +244,7 @@ function getListadoOrdenes($pendientes = FALSE) {
  * 3 - Subtotal de la Orden
  * 4 - Estado del Producto
  */
+
 function getDetalleOrdenPorId($idOrden) {
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -270,12 +271,24 @@ function getHtmlDetalleOrden($idOrden) {
     try {
         foreach ($consulta as $registro => $row) {
             $html .= '<tr>';
-            $html .= '<td>' . $row['nombre_prod'] . '</td>';
-            $html .= '<td>' . $row['cantidad_prod'] . '</td>';
+
+            if ($row['estado'] == "Cancelada") {
+                $html .= '<td><del>' . $row['nombre_prod'] . '</del></td>';
+            } else {
+                $html .= '<td>' . $row['nombre_prod'] . '</td>';
+            }
+
+            if ($row['estado'] == "Cancelada") {
+                $html .= '<td><del>' . $row['cantidad_prod'] . '</del></td>';
+            } else {
+                $html .= '<td>' . $row['cantidad_prod'] . '</td>';
+            }
+
             $html .= '<td>' . $row['estado'] . '</td>';
-            if ($row['estado']=="Cancelada"){
-                $html .= '<td>-' . $row['subtotal_orden'] . '</td>';
-            }else{
+
+            if ($row['estado'] == "Cancelada") {
+                $html .= '<td><del>' . $row['subtotal_orden'] . '</del></td>';
+            } else {
                 $html .= '<td>' . $row['subtotal_orden'] . '</td>';
             }
             if ($row['estado'] == "Atendida" || ($row['estado'] == "Cancelada")) {
@@ -299,6 +312,7 @@ function getHtmlDetalleOrden($idOrden) {
  * @$idDetalleProducto
  * @alEstado indica uno de 3 posibles estados: Pendiente-1; Atendido-2; Cancelado-4
  */
+
 function updateEstadoProducto($idDetalleProducto, $alEstado) {
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -320,6 +334,7 @@ function updateEstadoProducto($idDetalleProducto, $alEstado) {
  * -checkEstadoDetalleOrden
  * -
  */
+
 function checkEstadoDetalleOrden($idOrden) {
     $listado = listadoEstadoDetalleOrden($idOrden);
     $todoAtendido = TRUE;
@@ -331,12 +346,13 @@ function checkEstadoDetalleOrden($idOrden) {
             }
         }
         if ($todoAtendido) {
-            if (checkTodoCancelado($idOrden)){
+            if (checkTodoCancelado($idOrden)) {
                 $resultado = updateEstadoOrden($idOrden, 4); //Si todo esta CANCELADA, cambia el estado de la orden a CANCELADA.
-            } else{
+            } else {
                 $resultado = updateEstadoOrden($idOrden, 2); //Si todo esta ATENDIDO, cambia el estado de la orden a ATENDIDA.
             }
-            
+        } else {
+            $resultado = updateEstadoOrden($idOrden, 1); //Si hay algo PENDIENTE, se actualiza a PENDIENTE.
         }
     } catch (PDOException $e) {
         $resultado = FALSE;
@@ -349,6 +365,7 @@ function checkEstadoDetalleOrden($idOrden) {
  * Esta función se encarga de verificar si todos los productos se catalogan como CANCELADOS, 
  * de ser así, el estado de la orden debe cambiar a CANCELADA.
  */
+
 function checkTodoCancelado($idOrden) {
     $listadoCancelado = listadoEstadoDetalleOrden($idOrden);
     $todoCancelado = TRUE;
@@ -359,8 +376,6 @@ function checkTodoCancelado($idOrden) {
     }
     return $todoCancelado;
 }
-
-
 
 function listadoEstadoDetalleOrden($idOrden) {
     $pdo = Database::connect();
@@ -399,7 +414,7 @@ function updateEstadoOrden($idOrden, $alEstado) { //la variable $alEstado determ
     return $resultado;
 }
 
-function updateTotalOrden($idOrden){
+function updateTotalOrden($idOrden) {
     $nuevoTotal = recalcularTotalOrden($idOrden);
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -417,18 +432,18 @@ function updateTotalOrden($idOrden){
     return $resultado;
 }
 
-function recalcularTotalOrden($idOrden){
+function recalcularTotalOrden($idOrden) {
     $detallesOrden = getDetalleOrdenPorId($idOrden);
-    $nuevaCuenta = 0; 
+    $nuevaCuenta = 0;
     $descuento = 0;
     foreach ($detallesOrden as $row => $dato) {              //Se recorre el arreglo para obtener el monto a descontar.
-        $nuevaCuenta += $dato[3]; 
+        $nuevaCuenta += $dato[3];
         if ($dato[4] == 'Cancelada') {
             $descuento += $dato[3];
         }
     }
     $nuevoTotal = $nuevaCuenta - $descuento;
-    
+
     return $nuevoTotal;
 }
 
@@ -438,7 +453,7 @@ function getOrdenesAtendidas() {
     $sql = "SELECT o.id_ordenes, co.codigo_orden, cm.cod_mesa, c.nombre, c.apellido, o.total_orden, es.estado FROM ordenes o " .
             "INNER JOIN codigo_orden co ON co.id_orden = o.id_ordenes " .
             "INNER JOIN mesas cm ON cm.id_mesa = o.id_mesa " .
-            "LEFT JOIN detalle_consumo_cliente dcc ON dcc.id_orden = o.id_ordenes ".
+            "LEFT JOIN detalle_consumo_cliente dcc ON dcc.id_orden = o.id_ordenes " .
             "LEFT JOIN clientes c ON c.id_clientes = dcc.id_cliente " .
             "LEFT JOIN estados_orden es ON es.id_estadosOrden = o.id_estadoOrden " .
             "WHERE es.estado = 'Atendida'";
@@ -454,7 +469,8 @@ function getOrdenesAtendidas() {
     return $resultado;
 }
 
-function getHtmlOrdenAtendida() {    include_once 'utils.php';
+function getHtmlOrdenAtendida() {
+    include_once 'utils.php';
     $detalle = getOrdenesAtendidas();
     $html = '';
     foreach ($detalle as $registro => $row) {
@@ -468,3 +484,4 @@ function getHtmlOrdenAtendida() {    include_once 'utils.php';
     }
     return $html;
 }
+

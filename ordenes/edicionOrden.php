@@ -12,8 +12,8 @@ date_default_timezone_set('America/El_Salvador');
 $idRe = decode_get2(filter_input(INPUT_SERVER, 'REQUEST_URI'));
 //$user_id = null;
 $idOrden = $idRe['idOr'];
-$infoOrden = getInfoOrdenesPorId($idOrden );
-$detalleOrden = getDetalleOrdenPorId($idOrden );
+$infoOrden = getInfoOrdenesPorId($idOrden);
+$detalleOrden = getDetalleOrdenPorId($idOrden);
 $html = getHtmlDetalleOrden($idOrden);
 ?>
 <!DOCTYPE html>
@@ -129,14 +129,17 @@ $html = getHtmlDetalleOrden($idOrden);
                                 <!-- /.col -->
                                 <div class="col-md-6">
                                     <h4 class="box-title">Estado: <strong>
-                                            <?php if ($infoOrden[0][2] == 'Pendiente'){
+                                            <?php
+                                            if ($infoOrden[0][2] == 'Pendiente') {
                                                 echo "<span class='label label-warning'>" . $infoOrden[0][2] . "</span>";
-                                            }elseif ($infoOrden[0][2] == 'Atendida') {
-                                                echo "<span class='label label-success'>" . $infoOrden[0][2] . "</span>";
-                                            }elseif ($infoOrden[0][2] == 'Cancelada') {
+                                            } elseif ($infoOrden[0][2] == 'Atendida') {
+                                                echo "<span class='label label-primary'>" . $infoOrden[0][2] . "</span>";
+                                            } elseif ($infoOrden[0][2] == 'Cancelada') {
                                                 echo "<span class='label label-danger'>" . $infoOrden[0][2] . "</span>";
+                                            } elseif ($infoOrden[0][2] == 'Pagada') {
+                                                echo "<span class='label label-success'>" . $infoOrden[0][2] . "</span>";
                                             }
-                                                 ?>
+                                            ?>
                                         </strong>
                                     </h4>
                                 </div>
@@ -156,40 +159,46 @@ $html = getHtmlDetalleOrden($idOrden);
                         </div>
                         <div class="box-body">
                             <div id="divRecibo">
-                                
-                                <?php if($infoOrden[0][2] == 'Atendida' || $infoOrden[0][2] == 'Pendiente'){ ?>
-                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal">Agregar Productos</button>
-                               
-                            <?php echo ""; }?>
-                                
+
+                                <?php if ($infoOrden[0][2] == 'Atendida' || $infoOrden[0][2] == 'Pendiente') { ?>
+                                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal">Agregar Productos</button>
+
+                                    <?php
+                                    echo "";
+                                }
+                                ?>
+
                                 <!--Contenido del MODAL para agregar mas productos a la orden-->
                                 <div id="myModal" class="modal fade" role="dialog">
-                                <div class="modal-dialog">
+                                    <div class="modal-dialog">
 
-                                    <!-- Modal content-->
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                            <h4 class="modal-title">Ordenes Pendientes</h4>
+                                        <!-- Modal content-->
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                <h4 class="modal-title">Ordenes Pendientes</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <?php
+                                                //Table
+                                                require_once('../ordenes/listadoAddProductos.php');
+                                                ?>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                                            </div>
                                         </div>
-                                        <div class="modal-body">
-                                            <?php
-                                            //Table
-                                            require_once('../ordenes/listadoAddProductos.php');
-                                            ?>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-                                        </div>
+
                                     </div>
+                                </div> 
 
-                                </div>
-                            </div> 
-                                
-                                
-                            <?php if($infoOrden[0][2] == 'Atendida'){ ?>
-                                <input id="btn_generarRecibo" type="button" onclick="generarRecibo()" class="btn btn-success" value="Generar Recibo">
-                            <?php echo ""; }?>
+
+                                <?php if ($infoOrden[0][2] == 'Atendida') { ?>
+                                    <input id="btn_generarRecibo" type="button" onclick="generarPrecuenta()" class="btn btn-success" value="Generar Precuenta">
+                                    <?php
+                                    echo "";
+                                }
+                                ?>
                             </div>
                             <table id="example1" class="table table-bordered table-striped">
                                 <thead>
@@ -203,7 +212,7 @@ $html = getHtmlDetalleOrden($idOrden);
                                     </tr>
                                 </thead>
                                 <tbody id="tbl_detalleOrden">
-<?php echo $html; ?>
+                                    <?php echo $html; ?>
                                 </tbody>
                                 <tfoot>
                                     <tr>
@@ -221,13 +230,13 @@ $html = getHtmlDetalleOrden($idOrden);
                             </div>
                         </div>
                     </div>
-<button type="button" name="return" class="btn btn-default" onclick="history.back()">Regresar</button>
+                    <button type="button" name="return" class="btn btn-default" onclick="history.back()">Regresar</button>
                 </section>
                 <!-- /.content -->
             </div>
             <!-- /.content-wrapper -->
 
-<?php include_once '../includes/footer.php'; ?>
+            <?php include_once '../includes/footer.php'; ?>
 
             <div class="control-sidebar-bg"></div>
         </div>
@@ -236,61 +245,44 @@ $html = getHtmlDetalleOrden($idOrden);
         <script>
             function detalleAtendido(idDetalleOrd) {
                 var idOrden = "<?php echo $idOrden; ?>";
-                $.post("ordenHandler.php", {estadoDetalleAtendido: idDetalleOrd, idOrden:idOrden}, function (data) {
+                $.post("ordenHandler.php", {estadoDetalleAtendido: idDetalleOrd, idOrden: idOrden}, function (data) {
                     $("#tbl_detalleOrden").html(data);
-                    
+
                 });
             }
             function detalleCancelado(idDetalleOrd) {
                 var idOrden = "<?php echo $idOrden; ?>";
-                $.post("ordenHandler.php", {estadoDetalleCancelado: idDetalleOrd, idOrden:idOrden}, function (data) {
+                $.post("ordenHandler.php", {estadoDetalleCancelado: idDetalleOrd, idOrden: idOrden}, function (data) {
                     $("#tbl_detalleOrden").html(data);
                 });
             }
-            
-            
-function redirect_by_post(purl, pparameters, in_new_tab) {
-    pparameters = (typeof pparameters == 'undefined') ? {} : pparameters;
-    in_new_tab = (typeof in_new_tab == 'undefined') ? true : in_new_tab;
 
-    var form = document.createElement("form");
-    $(form).attr("id", "reg-form").attr("name", "reg-form").attr("action", purl).attr("method", "post").attr("enctype", "multipart/form-data");
-    if (in_new_tab) {
-        $(form).attr("target", "_blank");
-    }
-    $.each(pparameters, function(key) {
-        $(form).append('<input type="text" name="' + key + '" value="' + this + '" />');
-    });
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
 
-    return false;
-}
+            function redirect_by_post(purl, pparameters, in_new_tab) {
+                pparameters = (typeof pparameters == 'undefined') ? {} : pparameters;
+                in_new_tab = (typeof in_new_tab == 'undefined') ? true : in_new_tab;
 
-            function generarRecibo(){
+                var form = document.createElement("form");
+                $(form).attr("id", "reg-form").attr("name", "reg-form").attr("action", purl).attr("method", "post").attr("enctype", "multipart/form-data");
+                if (in_new_tab) {
+                    $(form).attr("target", "_blank");
+                }
+                $.each(pparameters, function (key) {
+                    $(form).append('<input type="text" name="' + key + '" value="' + this + '" />');
+                });
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
+
+                return false;
+            }
+
+            function generarPrecuenta() {
                 var idOrden = "<?php echo $idOrden; ?>";
                 redirect_by_post('../ordenes/impresionDetOrden.php', {
                     idOrden: idOrden
                 }, true);
             }
-        </script>
-
-        <script>
-            $(function () {
-                //TimePicker
-                $('.timepicker').timepicker({
-                    showInputs: false
-                });
-
-                //Date picker
-                $('#date_fechaOrd').datepicker({
-                    autoclose: true
-                });
-
-                //Select2
-                $(".select2").select2();
-            });
         </script>
     </body>
 </html>

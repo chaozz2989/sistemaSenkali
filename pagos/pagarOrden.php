@@ -223,6 +223,7 @@ $infoOrden = getInfoOrdenesPorId($idOrdenAPagar);
                                                                endif;
                                                                ?>"</td>
                                                 </tr>
+                                                <?php if ($infoOrden[0][2] != 'Pagada') { ?>
                                                 <tr>
                                                     <th>Redimir</th>
                                                     <td><label>
@@ -237,6 +238,7 @@ $infoOrden = getInfoOrdenesPorId($idOrdenAPagar);
                                                             ?> >
                                                         </label></td>
                                                 </tr>
+                                                <?php } ?>
                                                 <tr>
                                                     <th></th>
                                                     <td>
@@ -297,6 +299,7 @@ $infoOrden = getInfoOrdenesPorId($idOrdenAPagar);
                                                         <td>$ <label id="lblTotalAPagar"><?php echo $infoOrden[0][5]; ?></label>
                                                             <input type="hidden" value="<?php echo $infoOrden[0][5]; ?>" id="hTotalAPagar" name="fTotalAPagar"></td>
                                                     </tr>
+                                                    <?php if ($infoOrden[0][2] != 'Pagada') { ?>
                                                     <tr  border="2">
                                                         <th  border="2">Importe Recibido:</th>
                                                         <td  border="2">
@@ -306,7 +309,7 @@ $infoOrden = getInfoOrdenesPorId($idOrdenAPagar);
                                                             </div>
                                                         </td>
                                                     </tr>
-                                                    <?php if ($infoOrden[0][2] != 'Pagada') { ?>
+                                                    
                                                         <tr>
                                                             <td colspan="2"><button type="button" class="btn btn-success btn-agregar-producto" id="btn_pagar">Pagar</button></td>
                                                         </tr>
@@ -347,56 +350,60 @@ $infoOrden = getInfoOrdenesPorId($idOrdenAPagar);
 
 
         <script>
+            function redirect_by_post(purl, pparameters, in_new_tab) {
+                pparameters = (typeof pparameters == 'undefined') ? {} : pparameters;
+                in_new_tab = (typeof in_new_tab == 'undefined') ? true : in_new_tab;
 
-                                                            function redirect_by_post(purl, pparameters, in_new_tab) {
-                                                                pparameters = (typeof pparameters == 'undefined') ? {} : pparameters;
-                                                                in_new_tab = (typeof in_new_tab == 'undefined') ? true : in_new_tab;
+                var form = document.createElement("form");
+                $(form).attr("id", "reg-form").attr("name", "reg-form").attr("action", purl).attr("method", "post").attr("enctype", "multipart/form-data");
+                if (in_new_tab) {
+                    $(form).attr("target", "_blank");
+                }
+                $.each(pparameters, function (key) {
+                    $(form).append('<input type="text" name="' + key + '" value="' + this + '" />');
+                });
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
 
-                                                                var form = document.createElement("form");
-                                                                $(form).attr("id", "reg-form").attr("name", "reg-form").attr("action", purl).attr("method", "post").attr("enctype", "multipart/form-data");
-                                                                if (in_new_tab) {
-                                                                    $(form).attr("target", "_blank");
-                                                                }
-                                                                $.each(pparameters, function (key) {
-                                                                    $(form).append('<input type="text" name="' + key + '" value="' + this + '" />');
-                                                                });
-                                                                document.body.appendChild(form);
-                                                                form.submit();
-                                                                document.body.removeChild(form);
+                return false;
+            }
 
-                                                                return false;
-                                                            }
-
-                                                            $(document).ready(function () {
-                                                                $('#btn_pagar').click(function () {
-                                                                    var totalAPagar = parseFloat($('#hTotalAPagar').val());
-                                                                    var importe = parseFloat($('#importeRecibido').val());
-                                                                    var redimir = $('input[name="rbRedimir"]:checked').val();
-                                                                    //document.getElementById('rbRedimir').checked;
-                                                                    var idOrdenAPagar = "<?php echo $idOrdenAPagar; ?>";
-                                                                    var esCliente = "<?php echo $infoOrden[0][6]; ?>";
-
+            $(document).ready(function () {
+                $('#btn_pagar').click(function () {
+                    var totalAPagar = parseFloat($('#hTotalAPagar').val());
+                    var importe = parseFloat($('#importeRecibido').val());
+                    var redimir = $('input[name="rbRedimir"]:checked').val();
+                    //document.getElementById('rbRedimir').checked;
+                    var idOrdenAPagar = "<?php echo $idOrdenAPagar; ?>";
+                    var esCliente = "<?php echo $infoOrden[0][6]; ?>";
 
 
-                                                                    if (importe < totalAPagar || isNaN(importe)) {
-                                                                        alert("El importe debe ser mayor al Total a Pagar.");
-                                                                        $('#importeRecibido').focus();
-                                                                    } else {
-                                                                        if (esCliente == 0) {
-                                                                            redirect_by_post('../pagos/pagosHandler.php', {esCliente: esCliente, idOrdenAPagar: idOrdenAPagar, totalAPagar: totalAPagar, importe: importe}, true);
-                                                                        } else {
 
-                                                                            if (redimir == 0) {
-                                                                                var acumulable = document.getElementById('hAcumulable').value;
-                                                                                redirect_by_post('../pagos/pagosHandler.php', {esCliente: esCliente, idOrdenAPagar: idOrdenAPagar, totalAPagar: totalAPagar, importe: importe, acumulable: acumulable}, true);
-                                                                            } else if (redimir == 1) {
-                                                                                var descuento = parseFloat($('#hDescuento').val()); //document.getElementById('hDescuento').value;
-                                                                                redirect_by_post('../pagos/pagosHandler.php', {esCliente: esCliente, idOrdenAPagar: idOrdenAPagar, totalAPagar: totalAPagar, importe: importe, descuento: descuento}, true);
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                });
-                                                            });
+                    if (importe < totalAPagar || isNaN(importe)) {
+                        alert("El importe debe ser mayor al Total a Pagar.");
+                        document.getElementById('importeRecibido').value = 0;
+                        $('#importeRecibido').focus();
+                    } else {
+                        var pagar = confirm("Seguro que desea realizar el pago?");
+                        if (pagar == true) {
+                            if (esCliente == 0) {
+                                redirect_by_post('../pagos/pagosHandler.php', {esCliente: esCliente, idOrdenAPagar: idOrdenAPagar, totalAPagar: totalAPagar, importe: importe}, true);
+                            } else {
+
+                                if (redimir == 0) {
+                                    var acumulable = document.getElementById('hAcumulable').value;
+                                    redirect_by_post('../pagos/pagosHandler.php', {esCliente: esCliente, idOrdenAPagar: idOrdenAPagar, totalAPagar: totalAPagar, importe: importe, acumulable: acumulable}, true);
+                                } else if (redimir == 1) {
+                                    var descuento = parseFloat($('#hDescuento').val()); //document.getElementById('hDescuento').value;
+                                    redirect_by_post('../pagos/pagosHandler.php', {esCliente: esCliente, idOrdenAPagar: idOrdenAPagar, totalAPagar: totalAPagar, importe: importe, descuento: descuento}, true);
+                                }
+                            }
+                        }
+                    } 
+                    
+                });
+            });
         </script>
 
         <script language="javascript">
@@ -431,9 +438,28 @@ $infoOrden = getInfoOrdenesPorId($idOrdenAPagar);
                         document.getElementById('hTotalAPagar').value = nuevoPago;
                         document.getElementById('hDescuento').value = nuevoDescuento;
                         document.getElementById('hAcumulable').value = '0';
-
                     }
                 });
+            });
+            
+            $("#txtDescuento").focusout(function () {
+                var disponible = parseFloat(document.getElementById('lblDisponible').innerHTML);
+                var aDescontar = parseFloat($('#txtDescuento').val());
+                
+                if (aDescontar > disponible){
+                    document.getElementById('txtDescuento').value = disponible;
+                } else if(aDescontar < 0){
+                    document.getElementById('txtDescuento').value = 0;
+                }
+            });
+            $("#importeRecibido").focusout(function () {
+                var importe = parseFloat($('#importeRecibido').val());
+                
+                if(importe < 0){
+                    document.getElementById('importeRecibido').value = 0;
+                } else if(importe > 9999){
+                    document.getElementById('importeRecibido').value = 0;
+                }
             });
         </script>
 

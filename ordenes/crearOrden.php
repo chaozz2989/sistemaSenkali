@@ -269,7 +269,7 @@ date_default_timezone_set('America/El_Salvador');
                                         <input type="hidden" id="totalGlobal" name="totalGlobal" >
                                         <div class="box-footer">
                                             <button type="submit" class="btn btn-primary">Crear</button>
-                                            <button type="reset" class="btn btn-danger">Limpiar</button>
+                                            <button type="reset" name="reset" id="reset" class="btn btn-danger">Limpiar</button>
                                         </div>
 
                                     </form>
@@ -379,7 +379,7 @@ date_default_timezone_set('America/El_Salvador');
                                         <div class="row">
                                             <div class="col-md-12 text-right">
                                                 <button type="button" id="btn_vaciarOrden" class="btn btn-sm btn-default guardar-carrito">Vaciar</button>
-                                                <button type="submit" class="btn btn-sm btn-default guardar-carrito">Guardar</button>
+                                                <!--<button type="submit" class="btn btn-sm btn-default guardar-carrito">Guardar</button>-->
                                             </div>
                                         </div>
                                     </form>
@@ -403,7 +403,7 @@ date_default_timezone_set('America/El_Salvador');
         <!-- ./wrapper -->
 
 
-
+<!--Este Script funciona para agregar los productos al carrito-->
         <script>
             $(document).ready(function () {
                 $('#btn_addDetProd').click(function () {
@@ -413,6 +413,7 @@ date_default_timezone_set('America/El_Salvador');
                     if (codProducto === null || codProducto.length === 0) {
                         eval = false;
                         alert("Debe seleccionar un producto");
+                        document.getElementById("txt_cantidad").value = 1;
                     }
                     if (cantidad === null || cantidad.length === 0) {
                         eval = false;
@@ -424,6 +425,7 @@ date_default_timezone_set('America/El_Salvador');
                             $("#tbl_detalleOrden").html(data);
                             var tot = $('#totalPre').val();
                             $('#totalGlobal').attr('value', tot);
+                            document.getElementById("txt_cantidad").value = 1;
                         });
                     }
 
@@ -431,11 +433,11 @@ date_default_timezone_set('America/El_Salvador');
             });
         </script>
 
+<!--Script que vacia el carrito completamente-->
         <script>
             $(document).ready(function () {
                 $('#btn_vaciarOrden').click(function () {
                     var vac = 1;
-
                     $.post("ordenHandler.php", {vac: vac}, function (data) {
                         $("#tbl_detalleOrden").html(data);
                     });
@@ -443,6 +445,7 @@ date_default_timezone_set('America/El_Salvador');
             });
         </script>
 
+<!--Script que quita elementos del carrito-->
         <script>
             function unsetProd(uns) {
                 $.post("ordenHandler.php", {uns: uns}, function (data) {
@@ -451,6 +454,7 @@ date_default_timezone_set('America/El_Salvador');
             }
         </script>
 
+<!--Scripts para hacer que se muestre el calendario y la hora-->
         <script>
             $(function () {
                 //TimePicker
@@ -468,6 +472,7 @@ date_default_timezone_set('America/El_Salvador');
             });
         </script>
 
+<!--Script que realiza el filtro para mostrar las SUBCATEGORIAS cuando se selecciona una CATEGORIA-->
         <script language="javascript">
             $(document).ready(function () {
                 $("#lst_catProd").change(function () {
@@ -491,6 +496,7 @@ date_default_timezone_set('America/El_Salvador');
             });
         </script>
 
+<!--Script que realiza el filtro para mostrar los PRODUCTOS cuando se selecciona una SUBCATEGORIA-->
         <script language="javascript">
             $(document).ready(function () {
                 $("#lst_subcatProd").change(function () {
@@ -505,6 +511,7 @@ date_default_timezone_set('America/El_Salvador');
             });
         </script>
 
+<!--Script que sirve para mostrar u ocultar el listado de clientes-->
         <script type="text/javascript">
             function mostrarClientes() {
                 //Si la opcion con de que ES CLIENTE está activa, mostrará y obligará la selección de un cliente de la lista
@@ -521,5 +528,31 @@ date_default_timezone_set('America/El_Salvador');
             }
         </script>
         
+<!--Script que evalua que no se ingresen datos mayores ni menores a los establcidos en la CANTIDAD DE PRODUCTOS-->
+        <script>
+        $("#txt_cantidad").focusout(function () {
+            var cantidad = parseFloat($('#txt_cantidad').val());
+
+            if(cantidad < 0){
+                document.getElementById('txt_cantidad').value = 1;
+            } else if(cantidad > 50){
+                document.getElementById('txt_cantidad').value = 50;
+            }
+            
+            if(cantidad %1 != 0){
+                document.getElementById('txt_cantidad').value = parseInt(cantidad);
+            }
+        });
+        </script>
+        
+        <script>
+        $("#reset").click(function () {
+            var vac = 1;
+            $.post("ordenHandler.php", {vac: vac}, function (data) {
+                $("#tbl_detalleOrden").html(data);
+            });
+            window.location='crearOrden.php';
+        });
+        </script>
     </body>
 </html>

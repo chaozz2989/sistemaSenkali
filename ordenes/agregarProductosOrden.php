@@ -2,24 +2,26 @@
 
 session_start();
 
+include_once '../funciones/utils.php';
+$idOrden = filter_input(INPUT_POST, 'idOrden');
+$idOrdenEncyp = encode_this("idOr=" . $idOrden);
+
 if (!isset($_SESSION['detalle']) || $_SESSION['detalle'] == null) {
-    print "<script>alert(\"Debe agregar productos a la Orden.\");window.location='crearOrden.php';</script>";
+    print "<script>alert(\"Debe agregar productos a la Orden.\");window.location='edicionOrden.php?$idOrdenEncyp';</script>";
 } else {
     require_once '../funciones/fOrdenes.php';
     include_once '../conexion/conexion.php';
-    include_once '../funciones/utils.php';
 
-    $idOrden = filter_input(INPUT_POST, 'idOrden');
-    $idOrdenEncyp = encode_this("idOr=" . $idOrden);
     if (isset($idOrden)) {
         $resultadoIngreso = registrarDetalleOrden($idOrden);
-        if ($resultadoIngreso){
+        if ($resultadoIngreso) {
             updateTotalOrden($idOrden);
+            checkEstadoDetalleOrden($idOrden);
             $_SESSION['detalle'] = null;
         }
-       print "<script>alert(\"Productos agregados a la Orden!\");window.location='edicionOrden.php?$idOrdenEncyp';</script>";
+        print "<script>alert(\"Productos agregados a la Orden!\");window.location='edicionOrden.php?$idOrdenEncyp';</script>";
     } else {
-       print "<script>alert(\"Ocurrio un problema al agregar los productos!\");window.location='edicionOrden.php?". $idOrdenEncyp ."';</script>";
+        print "<script>alert(\"Ocurrio un problema al agregar los productos!\");window.location='edicionOrden.php?" . $idOrdenEncyp . "';</script>";
     }
 }
 
