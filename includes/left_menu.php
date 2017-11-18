@@ -55,8 +55,8 @@
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li><a href="#"><i class="fa fa-circle-o"></i> Nuevo Empleado</a></li>
-                    <li><a href="#"><i class="fa fa-circle-o"></i> Modificar Empleado</a></li>
+                    <li><a href="../empleados/crearEmpleado.php"><i class="fa fa-circle-o"></i> Nuevo Empleado</a></li>
+                    <li><a href="../empleados/listaEmpleado.php"><i class="fa fa-circle-o"></i> Modificar Empleado</a></li>
                 </ul>
             </li>
             <?php if ($_SESSION['idRol'] == 1) { ?>
@@ -145,8 +145,8 @@
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li><a href="#"><i class="fa fa-circle-o"></i> Nuevo Ingrediente</a></li>
-                    <li><a href="#"><i class="fa fa-circle-o"></i> Modificar Ingrediente</a></li>
+                    <li><a href="../mantenimiento/crearIngredientes.php"><i class="fa fa-circle-o"></i> Nuevo Ingrediente</a></li>
+                    <li><a href="../mantenimiento/listaIngredientes.php"><i class="fa fa-circle-o"></i> Modificar Ingrediente</a></li>
                 </ul>
             </li>
             <?php if ($_SESSION['idRol'] == 1) { ?>

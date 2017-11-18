@@ -158,7 +158,7 @@ $html = getHtmlDetalleOrden($idOrden);
                             <h2 class="box-title">Detalle</h2>
                         </div>
                         <div class="box-body">
-                            <div id="divRecibo">
+                            <div>
 
                                 <?php if ($infoOrden[0][2] == 'Atendida' || $infoOrden[0][2] == 'Pendiente') { ?>
                                     <button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal">Agregar Productos</button>
@@ -192,13 +192,14 @@ $html = getHtmlDetalleOrden($idOrden);
                                     </div>
                                 </div> 
 
-
-                                <?php if ($infoOrden[0][2] == 'Atendida') { ?>
-                                    <input id="btn_generarRecibo" type="button" onclick="generarPrecuenta()" class="btn btn-success" value="Generar Precuenta">
-                                    <?php
-                                    echo "";
-                                }
-                                ?>
+                                <div id="divRecibo">
+                                    <?php if ($infoOrden[0][2] == 'Atendida') { ?>
+                                        <input id="btn_generarRecibo" type="button" onclick="generarPrecuenta()" class="btn btn-success" value="Generar Precuenta">
+                                        <?php
+                                        echo "";
+                                    }
+                                    ?>
+                                </div>
                             </div>
                             <table id="example1" class="table table-bordered table-striped">
                                 <thead>

@@ -44,7 +44,7 @@ if (isset($idDetalleAtendido)){ //esta funcion cambia el estado del producto cua
         exit();
     } else {
         echo getHtmlDetalleOrden($idOrden);
-        print "<script>$('#encabezadoOrden' ).load(window.location.href + ' #encabezadoOrden' ); $('#divRecibo' ).load(window.location.href + ' #divRecibo' );</script>";
+        print "<script>$('#encabezadoOrden' ).load(window.location.href + ' #encabezadoOrden' ); $('#divRecibo' ).load(window.location.href + ' #divRecibo' ); </script>";
         
         exit();
     }
@@ -60,7 +60,7 @@ if (isset($idDetalleCancelado)){ //esta funcion cambia el estado del producto cu
         exit();
     } else {
         echo getHtmlDetalleOrden($idOrden);
-        print "<script>$('#encabezadoOrden' ).load(window.location.href + ' #encabezadoOrden' ); $('#div_TotalPago' ).load(window.location.href + ' #div_TotalPago' ); $('#divRecibo' ).load(window.location.href + ' #divRecibo' );</script>";
+        print "<script>$('#encabezadoOrden' ).load(window.location.href + ' #encabezadoOrden' ); $('#div_TotalPago' ).load(window.location.href + ' #div_TotalPago' ); $('#divRecibo' ).load(window.location.href + ' #divRecibo' ); </script>";
         exit();
     }
 }

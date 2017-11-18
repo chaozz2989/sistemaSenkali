@@ -32,7 +32,7 @@ if (isset($categoria)) {
     } catch (PDOException $e) {
         echo "<option value=1>-- Seleccione una SubCategoría --</option>";
         echo "Error al ejecutar la sentencia: \n";
-        write_log($e, 'Subcategorias');
+        print_r($e->getMessage());
     }
 }
 ?>

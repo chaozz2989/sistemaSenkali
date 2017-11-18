@@ -3,7 +3,11 @@ session_start();
 if (!isset($_SESSION["user_id"]) || $_SESSION["user_id"] == null) {
     print "<script>alert(\"Acceso invalido!\");window.location='index.php';</script>";
 }
-include "../funciones/funcion.php";
+require_once '../conexion/conexion.php';
+include "../funciones/fEmpleados.php";
+require "../funciones/fSucursales.php";
+require "../funciones/fRoles.php";
+include '../funciones/funcion.php';
 ?>
 
 <!DOCTYPE html>
@@ -11,7 +15,7 @@ include "../funciones/funcion.php";
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Area de Administracion</title>
+        <title>Area de Empleados</title>
         <!-- Tell the browser to be responsive to screen width -->
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
         <!-- Bootstrap 3.3.6 -->
@@ -59,7 +63,7 @@ include "../funciones/funcion.php";
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
-                        Area de Empleados
+                        Actualizar Empleado
                     </h1>
                 </section>
 
@@ -73,53 +77,98 @@ include "../funciones/funcion.php";
                         <section class="col-lg-7 connectedSortable">
 
                             <?php
-                            $idRe = $_GET["id_reservas"];
+                            $idRe = decode_get2(filter_input(INPUT_SERVER, 'REQUEST_URI'));
 
                             //$user_id = null;
-                            $query = getReservaPorId($idRe);
+                            $query = getEmpleadoPorId($idRe['idEmp']);
                             ?>
 
                             <?php if ($query != null): ?>
                                 <div class="box-body">
-                                    <form role="form" method="post" action="../controlador/actualizarReserva.php">
-                                        <?php foreach ($query as $resultado => $campoReserva) { ?>
+                                    <form role="form" method="post" action="../funciones/fEmpleados.php?<?php echo encode_this("acc=2&idEmp=".$idRe['idEmp']);?>">
+                                        <?php foreach ($query as $resultado => $campoEmpleado) { ?>
                                             <div class="form-group">
-                                                <label for="name">Descripcion</label>
-                                                <input type="text" class="form-control" value="<?php echo $campoReserva['descripcion']; ?>" name="descripcion" required>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="lastname">Fecha</label>
-                                                <input type="text" class="form-control" value="<?php echo $campoReserva['fecha']; ?>" name="fecha" disabled>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="address">Codigo</label>
-                                                <input type="text" class="form-control" value="<?php echo $campoReserva['codigo_reserva']; ?>" name="codReserva" required>
+                                                <label>Nombres del Empleado</label>
+                                                <input type="text" class="form-control" value="<?php echo $campoEmpleado['nombres']; ?>" name="nombreEmp" required>
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="state">Estado</label>
-
-                                                <select name="estado">
-                                                    <option value="" >- Seleccione -</option>
-
-                                                    <?php
-                                                    $prod = getEstadoReserva();
-
-                                                    foreach ($prod as $indice => $registro) {
-                                                        echo "<option value=" . $registro['id_estadoRes'];
-                                                        if ($registro['id_estadoRes'] == $campoReserva['id_estadoRes']) {
-                                                            echo " selected=true ";
-                                                        }
-                                                        echo ">" . $registro['estado_reserva'] . "</option>";
-                                                    }
-                                                    ?>
-                                                </select>
-
+                                                <label>Apellidos del Empleado</label>
+                                                <input type="text" class="form-control" value="<?php echo $campoEmpleado['apellidos']; ?>" name="apeEmp">
                                             </div>
 
-                                            <input type="hidden" name="id" value="<?php echo $_GET['id_reservas'];?>">
+                                            <div class="form-group">
+                                                <label>DUI</label>
+                                                <input type="text" class="form-control" value="<?php echo $campoEmpleado['dui']; ?>" name="duiEmp" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>NIT</label>
+                                                <input type="text" class="form-control" value="<?php echo $campoEmpleado['nit']; ?>" name="nitEmp" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Dirección</label>
+                                                <input type="text" class="form-control" value="<?php echo $campoEmpleado['direccion']; ?>" name="dirEmp" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Telefono</label>
+                                                <input type="text" class="form-control" value="<?php echo $campoEmpleado['telefono']; ?>" name="telEmp" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>email</label>
+                                                <input type="text" class="form-control" value="<?php echo $campoEmpleado['email']; ?>" name="emailEmp" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                            <label>Sucursal</label>
+                                            <select class="form-control select2" style="width: 100%;" name="sucursalEmp" id="sucursalEmp" required="true">
+                                                <option value="">-Seleccione una sucursal-</option>
+                                                <?php
+                                                $suc = getSucursales();
+
+                                                foreach ($suc as $indice => $registro) {
+                                                    echo "<option value=" . $registro['id_sucursal'] . ">" . $registro['descripcion_suc'] . "</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Rol</label>
+                                            <select class="form-control select2" style="width: 100%;" name="rolEmp" id="rolEmp" required="true">
+                                                <option value="">-Seleccione un rol-</option>
+                                                <?php
+                                                $rol = getRoles();
+
+                                                foreach ($rol as $indice => $registro) {
+                                                    echo "<option value=" . $registro['id_rol'] . ">" . $registro['rol'] . "</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                                <label>Estado</label>
+                                            <input type="radio" id="estEmp" name="estEmp" value="1" required="true">Activo &nbsp;&nbsp;
+                                            <input type="radio" id="estEmp" name="estEmp" value="0" required="true">Inactivo <br>
+                                        </div>
+
+                                        <div class="form-group">
+                                                <label>Usuario</label>
+                                                <input type="text" class="form-control" value="<?php echo $campoEmpleado['usu_empleado']; ?>" name="userEmp" required>
+                                            </div>
+
+                                        <div class="form-group">
+                                                <label>Clave</label>
+                                                <input type="text" class="form-control" value="<?php echo $campoEmpleado['clave_empleado']; ?>" name="claveEmp" required>
+                                            </div>
+
                                         <?php } ?>
                                         <button type="submit" class="btn btn-default">Actualizar</button>
+                                        <button type="button" class="btn btn-default">Regresar</button>
                                     </form>
                                 <?php else: ?>
                                     <p class="alert alert-danger">404 No se encuentra</p>
@@ -133,49 +182,57 @@ include "../funciones/funcion.php";
 
             </div>
             <!-- /.content-wrapper -->
-
-
-            <footer class="main-footer">
-                <div class="pull-right hidden-xs">
-                    <b>Sistema Web</b> Oficial
-                </div>
-                <strong>Derechos Reservados &copy; 2017-2020 <a href="http://almsaeedstudio.com">Senkali</a>.</strong> All rights
-                reserved.
-            </footer>
-
-
+            <?php require_once '../includes/footer.php'; ?>
 
 
             <div class="control-sidebar-bg"></div>
         </div>
         <!-- ./wrapper -->
 
-        <!-- jQuery 2.2.3 -->
+         <!-- jQuery 2.2.3 -->
         <script src="../plugins/jQuery/jquery-2.2.3.min.js"></script>
-        <!-- jQuery UI 1.11.4 -->
-        <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
-        <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
         <!-- Bootstrap 3.3.6 -->
         <script src="../bootstrap/js/bootstrap.min.js"></script>
-        <!-- Morris.js charts -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
-        <script src="../plugins/morris/morris.min.js"></script>
-        <!-- daterangepicker -->
+        <!-- Select2 -->
+        <script src="../plugins/select2/select2.full.min.js"></script>
+        <!-- InputMask -->
+        <script src="../plugins/input-mask/jquery.inputmask.js"></script>
+        <script src="../plugins/input-mask/jquery.inputmask.date.extensions.js"></script>
+        <script src="../plugins/input-mask/jquery.inputmask.extensions.js"></script>
+        <!-- date-range-picker -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
         <script src="../plugins/daterangepicker/daterangepicker.js"></script>
-        <!-- datepicker -->
+        <!-- bootstrap datepicker -->
         <script src="../plugins/datepicker/bootstrap-datepicker.js"></script>
-        <!-- Bootstrap WYSIHTML5 -->
-        <script src="../plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
-        <!-- Slimscroll -->
+        <!-- bootstrap color picker -->
+        <script src="../plugins/colorpicker/bootstrap-colorpicker.min.js"></script>
+        <!-- bootstrap time picker -->
+        <script src="../plugins/timepicker/bootstrap-timepicker.min.js"></script>
+        <!-- SlimScroll 1.3.0 -->
         <script src="../plugins/slimScroll/jquery.slimscroll.min.js"></script>
+        <!-- iCheck 1.0.1 -->
+        <script src="../plugins/iCheck/icheck.min.js"></script>
         <!-- FastClick -->
         <script src="../plugins/fastclick/fastclick.js"></script>
         <!-- AdminLTE App -->
         <script src="../dist/js/app.min.js"></script>
-        <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-        <script src="../dist/js/pages/dashboard.js"></script>
         <!-- AdminLTE for demo purposes -->
         <script src="../dist/js/demo.js"></script>
+
+
+        <script language="javascript">
+            $(document).ready(function () {
+                $("#catProd").change(function () {
+                    $("#catProd option:selected").each(function () {
+                        categoria = $(this).val();
+                        var subcategoria = $("#subCatHidden").val();
+                        $.post("subcategorias.php", {categoria: categoria, subcategoria: subcategoria}, function (data) {
+                            $("#subcatProd").html(data);
+                        });
+                    });
+                });
+            });
+        </script>
+
     </body>
 </html>

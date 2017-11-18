@@ -108,7 +108,7 @@ include_once '../funciones/fCategorias.php';
             <div class="form-group">
                 <label>Cantidad:</label>
                 <input id="txt_cantidad" name="txt_cantidad" class="col-md-2 form-control" placeholder="Ingrese cantidad" 
-                       min="1" max="50" step="1" data-bind="value: replyNumber " type="number" data-fv-integer-message="El valor no es un numero entero." required="true"/>
+                       min="1" max="50" step="1" type="number" required="true"/>
             </div>   
 
         </div>    
