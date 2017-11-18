@@ -1,6 +1,7 @@
 <?php
 $r = getTablaProductos();
 require_once '../funciones/utils.php';
+
 ?>
 
 <table class="table table-bordered table-hover">

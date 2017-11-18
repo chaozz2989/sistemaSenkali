@@ -73,18 +73,22 @@ include "../funciones/fCategorias.php";
                             <?php
                             $idRe = decode_get2(filter_input(INPUT_SERVER, 'REQUEST_URI'));
                             //$user_id = null;
-                            $query = getCategoriaPorId($idRe['idCat']);
+                            $query = getFullCategoriaPorId($idRe['idCat']);
                             ?>
 
                             <?php if ($query != null): ?>
                                 <div class="box-body">
                                     <form role="form" method="post" action="../funciones/fCategorias.php?<?php echo encode_this("acc=2&idCat=" . $idRe['idCat']); ?>">
-                                        <?php foreach ($query as $resultado => $campoCategoria) { ?>
-                                            <div class="form-group">
-                                                <label for="nombreCat">Categoría</label>
-                                                <input type="text" class="form-control" value="<?php echo $campoCategoria['nombre']; ?>" name="nombreCat" required="true">
-                                            </div>
-                                        <?php } ?>
+                                        
+
+                                        <div class="form-group">
+                                            <label for="nombreCat">Categoría</label>
+                                            <input type="text" class="form-control" value="<?php echo $query[0][1]; ?>" name="nombreCat" required="true">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="chkActivo">Activa</label>
+                                            <input type="checkbox" name="chkActiva" class="minimal" <?php if($query[0][2]==1): echo "checked"; endif; ?> >
+                                        </div>
                                         <button type="submit" class="btn btn-default">Actualizar</button>
                                         <button type="button" name="return" class="btn btn-default" onclick="history.back()">Regresar</button>
                                     </form>

@@ -88,8 +88,6 @@
                     <ul class="treeview-menu">
                         <li><a href="../ordenes/crearOrden.php"><i class="fa fa-circle-o"></i> Nueva Orden</a></li>
                         <li><a href="../pagos/listadoOrdenesPago.php"><i class="fa fa-circle-o"></i> Pagar Orden</a></li>
-                        <li><a href="#"><i class="fa fa-circle-o"></i> Modificar Reservacion</a></li>
-                        <li><a href="#"><i class="fa fa-circle-o"></i> Modificar Tipo de Evento</a></li>
                     </ul>
                 </li>
             <?php } ?>
@@ -105,8 +103,6 @@
                     </a>
                     <ul class="treeview-menu">
                         <li><a href="../monedero/monedero.php"><i class="fa fa-circle-o"></i> Monedero</a></li>
-
-
                     </ul>
                 </li>
             <?php } ?>
@@ -130,6 +126,17 @@
                             <ul class="treeview-menu">
                                 <li><a href="../mantenimiento/crearCategoria.php"><i class="fa fa-circle-o"></i> Crear Categoría</a></li>
                                 <li><a href="../mantenimiento/listaCategorias.php"><i class="fa fa-circle-o"></i> Modificar Categoría</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-circle-o"></i> SubCategorías
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </span>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li><a href="../mantenimiento/crearSubCat.php"><i class="fa fa-circle-o"></i> Crear SubCategoría</a></li>
+                                <li><a href="../mantenimiento/listaSubCat.php"><i class="fa fa-circle-o"></i> Modificar SubCategoría</a></li>
                             </ul>
                         </li>
                         <li><a href="../index2.html"><i class="fa fa-circle-o"></i>Crear Promociones</a></li>

@@ -4,15 +4,16 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["user_id"] == null) {
     print "<script>alert(\"Acceso invalido!\");window.location='index.php';</script>";
 }
 require_once '../conexion/conexion.php';
-include "../funciones/fIngredientes.php";
-?>
+require "../funciones/fCategorias.php";
+require_once '../funciones/fSubCategorias.php';
 
+?>
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Ingredientes</title>
+        <title>SubCategorias</title>
         <!-- Tell the browser to be responsive to screen width -->
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
         <!-- Bootstrap 3.3.6 -->
@@ -24,7 +25,7 @@ include "../funciones/fIngredientes.php";
         <!-- Theme style -->
         <link rel="stylesheet" href="../dist/css/AdminLTE.min.css">
         <!-- AdminLTE Skins. Choose a skin from the css/skins
-             folder instead of downloading all of them to reduce the load. -->
+           folder instead of downloading all of them to reduce the load. -->
         <link rel="stylesheet" href="../dist/css/skins/_all-skins.min.css">
         <!-- iCheck -->
         <link rel="stylesheet" href="../plugins/iCheck/flat/blue.css">
@@ -38,8 +39,6 @@ include "../funciones/fIngredientes.php";
         <link rel="stylesheet" href="../plugins/daterangepicker/daterangepicker.css">
         <!-- bootstrap wysihtml5 - text editor -->
         <link rel="stylesheet" href="../plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
-
-
     </head>
     <body class="hold-transition skin-blue sidebar-mini">
         <div class="wrapper">
@@ -58,77 +57,109 @@ include "../funciones/fIngredientes.php";
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
-                        Actualizar Ingrediente
+                        SubCategorías
+                        <small>Nueva SubCategoría</small>
                     </h1>
                 </section>
 
                 <!-- Main content -->
                 <section class="content">
                     <!-- Small boxes (Stat box) -->
-
                     <div class="row">
+
+                        <section class="col-lg-3 connectedSortable">
+                            <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Ver Listado de SubCategorías</button>
+
+                            <!-- Modal -->
+                            <div id="myModal" class="modal fade" role="dialog">
+                                <div class="modal-dialog">
+
+                                    <!-- Modal content-->
+                                    <div class="modal-content">
+
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <h4 class="modal-title">Listado de SubCategorías</h4>
+                                        </div>
+
+                                        <div class="modal-body">
+                                            <?php include 'tablaSubCat.php'; ?>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </section>
+
+
                         <!-- Left col -->
                         <section class="col-lg-7 connectedSortable">
-
-                            <?php
-                            $idRe = decode_get2(filter_input(INPUT_SERVER, 'REQUEST_URI'));
-                            //$user_id = null;
-                            $query = getIngredientePorId($idRe['id_ing']);
-                            ?>
-
-                            <?php if ($query != null): ?>
-                                <div class="box-body">
-                                    <form role="form" method="post" action="../funciones/fIngredientes.php?<?php echo encode_this("acc=2&id_ing=" . $idRe['id_ing']); ?>">
+                            <div class="box box-primary">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Registrar la Nueva SubCategoría</h3>
+                                </div>
+                                <form role="form" action="../funciones/fSubCategorias.php?<?php echo encode_this('acc=1'); ?>" method="post"><!--Hace referencia al archivo que controla todas las consultas referentes a Categorías-->
+                                    <div class="box-body">
+                                        <div class="form-group">
+                                            <label for="nombreProd">Nombre de la SubCategoría</label>
+                                            <input type="text" class="form-control" id="nombreSubCat" name="nombreSubCat" placeholder="Nombre de la Nueva SubCategoría" required="true">
+                                        </div>
                                         
-                                            <div class="form-group">
-                                                <label>Ingrediente</label>
-                                                <input type="text" class="form-control" value="<?php echo $query[0][1]; ?>" name="nombreIng" required="true">
-                                            </div>
+                                        <div class="form-group">
+                                            <label for="catProd">Categoría Madre</label>
+                                            <select class="form-control select2" style="width: 100%;" name="catProd" id="catProd" required="true">
+                                                <option value="">-Seleccione una Categoría-</option>
+                                                <?php
+                                                $cate = getCategorias();
 
-                                            <div class="form-group">
-                                                <label>Costo</label>
-                                                <input type="text" class="form-control" value="<?php echo $query[0][2]; ?>" name="costoIng" required="true">
-                                            </div>
+                                                foreach ($cate as $indice => $registro) {
+                                                    echo "<option value=" . $registro['id_categoria'] . ">" . $registro['nombre'] . "</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
                                         
-                                            <div class="form-group">
-                                                <label>Disponibilidad</label>
+                                        <div class="form-group">
+                                                <label>Activa</label>
                                                 <div class="radio">
                                                     <label>
-                                                        <input type="radio" id="rbActiva" name="rbActiva" value="1" <?php if ($query[0][3]==1): echo 'checked'; endif; ?>> 
+                                                        <input type="radio" id="dispIng" name="rbActiva" value="1" checked> 
                                                         SI
                                                     </label>
                                                 </div>
                                                 <div class="radio">
                                                     <label>
-                                                        <input type="radio" id="rbActiva" name="rbActiva" value="0" <?php if ($query[0][3]==0): echo 'checked'; endif; ?>>
+                                                        <input type="radio" id="dispIng" name="rbActiva" value="0">
                                                         NO
                                                     </label>
                                                 </div>
                                             </div>
-
-                                        <button type="submit" class="btn btn-default">Actualizar</button>
-                                        <button type="button" name="return" class="btn btn-default" onclick="history.back()">Regresar</button>
-                                    </form>
-                                    <?php
-                                else:
-                                    require_once '../includes/404.php';
-                                endif;
-                                ?>
+                                    </div>
+                                    
+                                    
+                                    <div class="box-footer">
+                                        <button type="submit" class="btn btn-primary">Guardar</button>
+                                        <button type="reset" class="btn btn-danger">Limpiar</button>
+                                    </div>
+                                </form>
                             </div>
-
                         </section>
-
                     </div>
                 </section>
-
             </div>
             <!-- /.content-wrapper -->
-
-            <?php include_once '../includes/footer.php'; ?>
+            <!-- Se incluye el pie de página-->
+            <?php include '../includes/footer.php';?> 
             
             <div class="control-sidebar-bg"></div>
         </div>
-        <!-- ./wrapper -->
+
+
+
 
         <!-- jQuery 2.2.3 -->
         <script src="../plugins/jQuery/jquery-2.2.3.min.js"></script>
@@ -159,5 +190,18 @@ include "../funciones/fIngredientes.php";
         <script src="../dist/js/app.min.js"></script>
         <!-- AdminLTE for demo purposes -->
         <script src="../dist/js/demo.js"></script>
+
+        <script language="javascript">
+            $(document).ready(function () {
+                $("#catProd").change(function () {
+                    $("#catProd option:selected").each(function () {
+                        categoria = $(this).val();
+                        $.post("subcategorias.php", {categoria: categoria}, function (data) {
+                            $("#subcatProd").html(data);
+                        });
+                    });
+                });
+            });
+        </script>
     </body>
 </html>

@@ -18,7 +18,8 @@ if (isset($uri)) {
         } else if ($acc == 2) { //Detecta si se va a actualizar una Categoría
             $idCat = $uri['idCat'];
             $nombreCat = filter_input(INPUT_POST, 'nombreCat');
-            $resultado = modificarCategoria($idCat, $nombreCat);
+            $chkActiva = filter_input(INPUT_POST, 'chkActiva');
+            $resultado = modificarCategoria($idCat, $nombreCat, $chkActiva);
             if ($resultado) {
                 print "<script>alert(\"Categoría Actualizada\");window.location='../mantenimiento/crearCategoria.php';</script>";
             } else {
@@ -30,11 +31,10 @@ if (isset($uri)) {
 
 
 function registrarCategoria($nombreCategoria){
-    $resultado = null;
     try{
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $sql = "INSERT INTO categorias (nombre) values (?)";
+    $sql = "INSERT INTO categorias (nombre, estado) values (?, 1)";
         $q = $pdo->prepare($sql);
         $q->execute(array($nombreCategoria));
         Database::disconnect();
@@ -47,14 +47,13 @@ function registrarCategoria($nombreCategoria){
 }
 
 
-function modificarCategoria($idCategoria, $nombreCategoria){
-    $resultado = null;
+function modificarCategoria($idCategoria, $nombreCategoria, $chkActiva){
     try {
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $sql = "UPDATE categorias SET nombre=? WHERE id_categoria=?;";
+    $sql = "UPDATE categorias SET nombre=?, estado=? WHERE id_categoria=?;";
         $q = $pdo->prepare($sql);
-        $q->execute(array($nombreCategoria, $idCategoria));
+        $q->execute(array($nombreCategoria, $chkActiva, $idCategoria));
         Database::disconnect();
         $resultado = TRUE;
     } catch (PDOException $e) {
@@ -69,7 +68,7 @@ function getCategoriaPorId($param) {
     try {
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $sql = "select * from categorias WHERE id_categoria = " . $param;
+    $sql = "select * from categorias WHERE id_categoria = " . $param . " AND estado=1";
         $q = $pdo->prepare($sql);
         $q->execute();
         $resultado = $q->fetchAll();
@@ -85,7 +84,7 @@ function getCategorias() {
     $resultado = null;
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $sql = "SELECT * FROM categorias";
+    $sql = "SELECT * FROM categorias WHERE estado=1";
     try {
         $q = $pdo->prepare($sql);
         $q->execute();
@@ -98,11 +97,12 @@ function getCategorias() {
     return $resultado;
 }
 
+/*
 function getSubCategorias() {
     $resultado = null;
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $sql = "SELECT * FROM subcategorias";
+    $sql = "SELECT * FROM subcategorias WHERE estado=1";
     try {
         $q = $pdo->prepare($sql);
         $q->execute();
@@ -111,6 +111,40 @@ function getSubCategorias() {
     } catch (PDOException $e) {
         $resultado = false;
         write_log($e, "getSubcategorias");
+    }
+    return $resultado;
+}
+*/
+
+function getFullCategorias() {
+    $pdo = Database::connect();
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $sql = "SELECT * FROM categorias";
+    try {
+        $q = $pdo->prepare($sql);
+        $q->execute();
+        $resultado = $q->fetchAll();
+        Database::disconnect();
+    } catch (PDOException $e) {
+        $resultado = false;
+        write_log($e, "getFullCategorias");
+    }
+    return $resultado;
+}
+
+function getFullCategoriaPorId($param) {
+    $resultado = null;
+    try {
+    $pdo = Database::connect();
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $sql = "select * from categorias WHERE id_categoria = " . $param;
+        $q = $pdo->prepare($sql);
+        $q->execute();
+        $resultado = $q->fetchAll();
+        Database::disconnect();
+    } catch (PDOException $e) {
+        $resultado = 'ERROR: Comunicarse con el Administrador.';
+        write_log($e, "getFullCategoriaPorId");
     }
     return $resultado;
 }

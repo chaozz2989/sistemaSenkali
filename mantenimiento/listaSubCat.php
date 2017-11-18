@@ -5,6 +5,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["user_id"] == null) {
 }
 require_once '../conexion/conexion.php';
 include "../funciones/fCategorias.php";
+include_once '../funciones/fSubCategorias.php';
 ?>
 
 <!DOCTYPE html>
@@ -12,7 +13,7 @@ include "../funciones/fCategorias.php";
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Area de Categorias</title>
+        <title>SubCategorias</title>
         <!-- Tell the browser to be responsive to screen width -->
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
         <!-- Bootstrap 3.3.6 -->
@@ -60,8 +61,8 @@ include "../funciones/fCategorias.php";
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
-                        Categorías
-                        <small>Modificar categorías</small>
+                        SubCategorías
+                        <small>Modificar SubCategoría</small>
                     </h1>
                 </section>
 
@@ -73,16 +74,17 @@ include "../funciones/fCategorias.php";
                         <div class="col-xs-12">
                             <div class="box">
                                 <div class="box-header">
-                                    <h3 class="box-title">Lista de Categorías</h3>
+                                    <h3 class="box-title">Lista de SubCategorías</h3>
                                 </div>
-                                <?php $data= getFullCategorias(); ?>
+                                <?php $data= getListaCompletaSubCat(); ?>
                                 <!-- /.box-header -->
                                 <div class="box-body">
                                     <table id="example1" class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
-                                                <th>ID Categoría</th>
+                                                <th>ID SubCategoría</th>
                                                 <th>Categoría</th>
+                                                <th>SubCategoria</th>
                                                 <th>Estado</th>
                                                 <th></th>
                                             </tr>
@@ -90,7 +92,8 @@ include "../funciones/fCategorias.php";
                                         <tbody>
                                             <?php foreach ($data as $row => $registro) {?>
                                             <tr>
-                                                <td><?php echo $registro['id_categoria']?></td>
+                                                <td><?php echo $registro['id_subcategoria']?></td>
+                                                <td><?php echo $registro['nombreCat']?></td>
                                                 <td><?php echo $registro['nombre']?></td>
                                                 <td><?php if ($registro['estado'] == 1){
                                                     echo 'Activo'; 
@@ -99,15 +102,16 @@ include "../funciones/fCategorias.php";
                                                 }?>
                                                 </td>
                                                 <td style="width:150px;">
-                                                    <a href="editCategoria.php?<?php echo encode_this('idCat='.$registro["id_categoria"]); ?>" class="btn btn-sm btn-warning">Editar</a>
+                                                    <a href="editSubCat.php?<?php echo encode_this('idSubCat='.$registro["id_subcategoria"]); ?>" class="btn btn-sm btn-warning">Editar</a>
                                                 </td>
                                             </tr>
                                             <?php }?>
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <th>ID Categoría</th>
+                                                <th>ID SubCategoría</th>
                                                 <th>Categoría</th>
+                                                <th>SubCategoria</th>
                                                 <th>Estado</th>
                                                 <th></th>
                                             </tr>

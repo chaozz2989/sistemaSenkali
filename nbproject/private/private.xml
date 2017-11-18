@@ -3,15 +3,22 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/xampp/htdocs/sistemaSenkali/pagos/pagarOrden.php</file>
+            <file>file:/C:/xampp/htdocs/sistemaSenkali/mantenimiento/delCategoria.php</file>
             <file>file:/C:/xampp/htdocs/sistemaSenkali/funciones/funcion.php</file>
+            <file>file:/C:/xampp/htdocs/sistemaSenkali/funciones/fCategorias.php</file>
+            <file>file:/C:/xampp/htdocs/sistemaSenkali/ordenes/listadoAddProductos.php</file>
+            <file>file:/C:/xampp/htdocs/sistemaSenkali/productos/subcategorias.php</file>
+            <file>file:/C:/xampp/htdocs/sistemaSenkali/ordenes/ordenHandler.php</file>
+            <file>file:/C:/xampp/htdocs/sistemaSenkali/pagos/pagarOrden.php</file>
+            <file>file:/C:/xampp/htdocs/sistemaSenkali/includes/left_menu.php</file>
+            <file>file:/C:/xampp/htdocs/sistemaSenkali/mantenimiento/listaCategorias.php</file>
+            <file>file:/C:/xampp/htdocs/sistemaSenkali/mantenimiento/editCategoria.php</file>
             <file>file:/C:/xampp/htdocs/sistemaSenkali/ordenes/agregarProductosOrden.php</file>
             <file>file:/C:/xampp/htdocs/sistemaSenkali/ordenes/crearOrden.php</file>
-            <file>file:/C:/xampp/htdocs/sistemaSenkali/ordenes/listadoAddProductos.php</file>
             <file>file:/C:/xampp/htdocs/sistemaSenkali/funciones/fOrdenes.php</file>
             <file>file:/C:/xampp/htdocs/sistemaSenkali/ordenes/impresionDetOrden.php</file>
+            <file>file:/C:/xampp/htdocs/sistemaSenkali/pages/forms/advanced.html</file>
             <file>file:/C:/xampp/htdocs/sistemaSenkali/ordenes/edicionOrden.php</file>
-            <file>file:/C:/xampp/htdocs/sistemaSenkali/ordenes/ordenHandler.php</file>
         </group>
     </open-files>
 </project-private>

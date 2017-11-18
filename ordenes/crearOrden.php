@@ -253,7 +253,6 @@ date_default_timezone_set('America/El_Salvador');
                                                 <label>Cliente: </label>
                                                 <select name="lst_cliente" id="lst_cliente" class="form-control select2" required="true">
                                                     <option value="">- Seleccione-</option>
-
                                                     <?php
                                                     $cliente = getClientes();
                                                     foreach ($cliente as $indice => $registro):

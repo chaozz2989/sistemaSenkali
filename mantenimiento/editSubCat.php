@@ -5,6 +5,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["user_id"] == null) {
 }
 require_once '../conexion/conexion.php';
 include "../funciones/fCategorias.php";
+include_once '../funciones/fSubCategorias.php';
 ?>
 
 <!DOCTYPE html>
@@ -12,7 +13,7 @@ include "../funciones/fCategorias.php";
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Area de Categorias</title>
+        <title>Area de SubCategorias</title>
         <!-- Tell the browser to be responsive to screen width -->
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
         <!-- Bootstrap 3.3.6 -->
@@ -23,8 +24,6 @@ include "../funciones/fCategorias.php";
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
         <!-- Theme style -->
         <link rel="stylesheet" href="../dist/css/AdminLTE.min.css">
-        <!-- DataTables -->
-        <link rel="stylesheet" href="../plugins/datatables/dataTables.bootstrap.css">
         <!-- AdminLTE Skins. Choose a skin from the css/skins
              folder instead of downloading all of them to reduce the load. -->
         <link rel="stylesheet" href="../dist/css/skins/_all-skins.min.css">
@@ -60,71 +59,89 @@ include "../funciones/fCategorias.php";
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
-                        Categorías
-                        <small>Modificar categorías</small>
+                        Actualizar SubCategoría
                     </h1>
                 </section>
 
                 <!-- Main content -->
                 <section class="content">
                     <!-- Small boxes (Stat box) -->
+
                     <div class="row">
                         <!-- Left col -->
-                        <div class="col-xs-12">
-                            <div class="box">
-                                <div class="box-header">
-                                    <h3 class="box-title">Lista de Categorías</h3>
-                                </div>
-                                <?php $data= getFullCategorias(); ?>
-                                <!-- /.box-header -->
+                        <section class="col-lg-7 connectedSortable">
+
+                            <?php
+                            $idRe = decode_get2(filter_input(INPUT_SERVER, 'REQUEST_URI'));
+                            //$user_id = null;
+                            $query = getFullSubCatPorId($idRe['idSubCat']);
+                            ?>
+
+                            <?php if ($query != null): ?>
                                 <div class="box-body">
-                                    <table id="example1" class="table table-bordered table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>ID Categoría</th>
-                                                <th>Categoría</th>
-                                                <th>Estado</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($data as $row => $registro) {?>
-                                            <tr>
-                                                <td><?php echo $registro['id_categoria']?></td>
-                                                <td><?php echo $registro['nombre']?></td>
-                                                <td><?php if ($registro['estado'] == 1){
-                                                    echo 'Activo'; 
-                                                } else{
-                                                    echo 'Inactivo'; 
-                                                }?>
-                                                </td>
-                                                <td style="width:150px;">
-                                                    <a href="editCategoria.php?<?php echo encode_this('idCat='.$registro["id_categoria"]); ?>" class="btn btn-sm btn-warning">Editar</a>
-                                                </td>
-                                            </tr>
-                                            <?php }?>
-                                        </tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <th>ID Categoría</th>
-                                                <th>Categoría</th>
-                                                <th>Estado</th>
-                                                <th></th>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
-                                <!-- /.box-body -->
+                                    <form role="form" method="post" action="../funciones/fSubCategorias.php?<?php echo encode_this("acc=2&idSubCat=" . $idRe['idSubCat']); ?>">
+
+                                        <div class="form-group">
+                                            <label for="nombreSubCat">SubCategoria</label>
+                                            <input type="text" class="form-control" value="<?php echo $query[0][2]; ?>" name="nombreSubCat" required="true">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="catProd">Categoría Madre</label>
+                                            <select class="form-control select2" style="width: 100%;" name="catProd" id="catProd" required="true">
+                                                <option value="">-Seleccione una Categoría-</option>
+                                                <?php
+                                                $cate = getCategorias();
+
+                                                foreach ($cate as $indice => $registro) {
+                                                    echo "<option value=" . $registro['id_categoria'];
+                                                    if ($registro['id_categoria'] == $query[0][1]){
+                                                        echo " selected ";
+                                                    }
+                                                    echo " >" . $registro['nombre'] . "</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                                <label>Activa</label>
+                                                <div class="radio">
+                                                    <label>
+                                                        <input type="radio" id="dispIng" name="rbActiva" value="1" <?php if ($query[0][3]==1): echo 'checked'; endif; ?>> 
+                                                        SI
+                                                    </label>
+                                                </div>
+                                                <div class="radio">
+                                                    <label>
+                                                        <input type="radio" id="dispIng" name="rbActiva" value="0" <?php if ($query[0][3]==0): echo 'checked'; endif; ?>>
+                                                        NO
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        
+                                        
+                                        <button type="submit" class="btn btn-default">Actualizar</button>
+                                        <button type="button" name="return" class="btn btn-default" onclick="history.back()">Regresar</button>
+                                        
+                                    </form>
+                                    <?php
+                                else:
+                                    require_once '../includes/404.php';
+                                endif;
+                                ?>
                             </div>
-                            <!-- /.box -->
-                        </div>
+
+                        </section>
+
                     </div>
                 </section>
+
             </div>
             <!-- /.content-wrapper -->
 
             <?php include_once '../includes/footer.php'; ?>
-
+            
             <div class="control-sidebar-bg"></div>
         </div>
         <!-- ./wrapper -->
@@ -158,21 +175,5 @@ include "../funciones/fCategorias.php";
         <script src="../dist/js/app.min.js"></script>
         <!-- AdminLTE for demo purposes -->
         <script src="../dist/js/demo.js"></script>
-
-
-        <script language="javascript">
-            $(document).ready(function () {
-                $("#catProd").change(function () {
-                    $("#catProd option:selected").each(function () {
-                        categoria = $(this).val();
-                        var subcategoria = $("#subCatHidden").val();
-                        $.post("subcategorias.php", {categoria: categoria, subcategoria: subcategoria}, function (data) {
-                            $("#subcatProd").html(data);
-                        });
-                    });
-                });
-            });
-        </script>
-
     </body>
 </html>

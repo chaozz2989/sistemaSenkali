@@ -21,8 +21,8 @@ if (isset($uri)) {
             $iding = $uri['id_ing'];
             $nombreIng = filter_input(INPUT_POST, 'nombreIng');
             $costoIng = filter_input(INPUT_POST, 'costoIng');
-            $dispoIng = filter_input(INPUT_POST, 'dispIng');
-            $resultado = modificarIngrediente($iding, $nombreIng, $costoIng, $dispoIng);
+            $dispoIng = filter_input(INPUT_POST, 'rbActiva');
+            $resultado = modificarIngrediente($nombreIng, $costoIng, $dispoIng, $iding);
             
             if ($resultado) {
                 print "<script>alert(\"Ingrediente Actualizado\");window.location='../mantenimiento/crearIngredientes.php';</script>";
@@ -52,15 +52,15 @@ function registrarIngrediente($nombreIng, $costoIng, $dispoIng){
 }
 
 
-function modificarIngrediente($iding, $nombreIng, $costoIng, $dispoIng){
-    $resultado = null;
+function modificarIngrediente($nombreIng, $costoIng, $dispoIng, $iding){
+
     try {
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $sql = "UPDATE ingredientes SET ingrediente=?, costo=?, disponibilidad=? WHERE id_ingrediente=?;";
     
         $q = $pdo->prepare($sql);
-        $q->execute(array($iding,$nombreIng,$costoIng,$dispoIng));
+        $q->execute(array($nombreIng, $costoIng, $dispoIng, $iding));
         Database::disconnect();
         $resultado = TRUE;
     } catch (PDOException $e) {
@@ -70,6 +70,12 @@ function modificarIngrediente($iding, $nombreIng, $costoIng, $dispoIng){
     return $resultado;
 }
 
+/*
+ * 0 - Id del Ingrediente
+ * 1 - nombre del ingrediente
+ * 2 - Costo del Ingrediente
+ * 3 - Disponibilidad
+ */
 function getIngredientePorId($param) {
     $resultado = null;
     try {
