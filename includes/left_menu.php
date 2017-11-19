@@ -116,7 +116,7 @@
                     </a>
                     <ul class="treeview-menu">
                         <li class="active"><a href="../productos/crearProducto.php"><i class="fa fa-circle-o"></i>Crear Producto</a></li>
-                        <li class="active"><a href="#"><i class="fa fa-circle-o"></i>Modificar Producto</a></li>
+                        <li class="active"><a href="../productos/listadoProductos.php"><i class="fa fa-circle-o"></i>Modificar Producto</a></li>
                         <li>
                             <a href="#"><i class="fa fa-circle-o"></i> Categorías
                                 <span class="pull-right-container">

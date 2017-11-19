@@ -20,7 +20,7 @@ date_default_timezone_set('America/El_Salvador');
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Area de Administracion</title>
+        <title>Ordenes</title>
         <!-- Tell the browser to be responsive to screen width -->
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
         <!-- Bootstrap 3.3.6 -->
@@ -96,15 +96,14 @@ date_default_timezone_set('America/El_Salvador');
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
-                        Area de Administracion
-                        <small>Control panel</small>
+                        Ordenes
+                        <small>Nueva Orden</small>
                     </h1>
                 </section>
 
                 <!-- Main content -->
                 <section class="content">
                     <!-- Small boxes (Stat box) -->
-
 
                     <div class="row">
                         <!-- Left col -->
@@ -139,7 +138,6 @@ date_default_timezone_set('America/El_Salvador');
                         <br><br><br><br>
                         <div class="col-md-6">
                             <section>
-
                                 <div class="box box-primary">
                                     <div class="box-header with-border">
                                         <h3 class="box-title">Nueva Orden</h3>
@@ -274,7 +272,7 @@ date_default_timezone_set('America/El_Salvador');
                                     </form>
                                 </div>
                             </section>
-                        </div> 
+                        </div>
 
                         <div class="col-md-5">
 
@@ -335,7 +333,7 @@ date_default_timezone_set('America/El_Salvador');
                                     <div class="panel-heading">
                                         <h3 class="panel-title">Productos</h3>
                                     </div>
-                                    <form action="../ordenes/guardarDetOrden.php" method="post">
+                                    <form action="#" method="post">
                                         <div class="panel-body detalle-producto"  id="resp">
 
                                             <table class="table">

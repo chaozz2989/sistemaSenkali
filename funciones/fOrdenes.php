@@ -25,14 +25,14 @@ function registrarOrdenCompleta($mesa, $empleado, $tipoOrden, $fechaHora, $total
         $lastId = $pdo->lastInsertId();
     } catch (PDOException $e) {
         $resultado = false;
-        write_log($e, "registrarProducto");
+        write_log($e, "registrarOrdenCompleta");
     }
 
     if ($lastId != 0 && $resultado) {                               //************ PASO #2 se registra todo el detalle de la Orden
         $resultado = registrarDetalleOrden($lastId);
         if ($resultado) {                                          //************** PASO #3 se genera y se registra el código de la Orden
-            $resultado = getCodigoOrden($lastId, $mesa, $empleado);
-            if ($resultado != 'ERROR DE CODIGO DE ORDEN') {                         //*************** PASO #4 Si es cliente, se registra en el detalle consumo cliente
+            $mensaje = getCodigoOrden($lastId, $mesa, $empleado);
+            if ($mensaje != 'ERROR DE CODIGO DE ORDEN') {                         //*************** PASO #4 Si es cliente, se registra en el detalle consumo cliente
                 if ($esCliente) {
                     registrarSiEsCliente($idCliente, $lastId);
                 }
@@ -46,7 +46,7 @@ function registrarOrdenCompleta($mesa, $empleado, $tipoOrden, $fechaHora, $total
         $mensaje = 'Ocurrio un error al registrar la Orden';
     }
 
-    return $resultado;
+    return $mensaje;
 }
 
 function registrarDetalleOrden($idOrden) {//SECUENCIA PARA INGRESAR EL DETALLE DE LA ORDEN A LA BASE DE DATOS; DEVUELVE UN BOOLEAN

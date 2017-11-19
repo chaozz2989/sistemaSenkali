@@ -1,7 +1,5 @@
 <?php
 
-
-
 session_start();
 /* if (!isset($_SESSION['idUsuario'])) {
   echo "<script type='text/javascript'>"
@@ -81,8 +79,8 @@ if (isset($_SESSION["detalle"])) { //Manejo del carrito de productos de la orden
             $arreglo[$numero]['cantidad'] = $arreglo[$numero]['cantidad'] + $cantidad;
             $_SESSION["detalle"] = $arreglo;
         } else {
-            $nombreProducto = "";
-            $precioProducto = 0;
+            /*$nombreProducto = "";
+            $precioProducto = 0;*/
             try {
                 $pdo = Database::connect();
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -142,8 +140,8 @@ if (isset($_SESSION["detalle"])) { //Manejo del carrito de productos de la orden
 
 
 if (isset($_SESSION["detalle"])) {
-    $condicion = "";
-    $html = "";
+//    $condicion = "";
+//    $html = "";
     $datos = $_SESSION["detalle"];
     $totalGlobal = 0;
     for ($i = 0; $i < count($datos); $i++) {

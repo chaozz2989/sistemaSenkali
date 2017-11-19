@@ -33,7 +33,6 @@ if (isset($uri)) {
     }
 }
 
-
 function registrarIngrediente($nombreIng, $costoIng, $dispoIng){
     $resultado = null;
     try{
@@ -71,20 +70,19 @@ function modificarIngrediente($nombreIng, $costoIng, $dispoIng, $iding){
 }
 
 /*
- * 0 - Id del Ingrediente
- * 1 - nombre del ingrediente
- * 2 - Costo del Ingrediente
- * 3 - Disponibilidad
+ * 0 - Id del Ingrediente 'id_ingrediente'
+ * 1 - nombre del ingrediente 'ingrediente'
+ * 2 - Costo del Ingrediente 'costo'
+ * 3 - Disponibilidad 'disponibilidad'
  */
 function getIngredientePorId($param) {
-    $resultado = null;
     try {
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $sql = "select * from ingredientes WHERE id_ingrediente = " . $param;
         $q = $pdo->prepare($sql);
         $q->execute();
-        $resultado = $q->fetchAll();
+        $resultado = $q->fetch(PDO::FETCH_ASSOC);
         Database::disconnect();
     } catch (PDOException $e) {
         $resultado = 'ERROR: Comunicarse con el Administrador.';
@@ -93,11 +91,10 @@ function getIngredientePorId($param) {
     return $resultado;
 }
 
-function getIngredientes() {
-    $resultado = null;
+function getIngredientesDisponibles() {
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $sql = "SELECT * FROM ingredientes";
+    $sql = "SELECT * FROM ingredientes WHERE disponibilidad = 1";
     try {
         $q = $pdo->prepare($sql);
         $q->execute();
@@ -105,7 +102,7 @@ function getIngredientes() {
         Database::disconnect();
     } catch (PDOException $e) {
         echo "Error al ejecutar la sentencia: \n";
-        print_r($e->getMessage());
+        write_log($e, 'getIngredientes');
     }
     return $resultado;
 }

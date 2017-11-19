@@ -15,7 +15,7 @@ if (isset($uri)) {
                 print "<script>alert(\"SubCategoría Creada\");window.location='../mantenimiento/crearSubCat.php';</script>";
             } else {
                 print "<script>alert(\"Ocurrió un Problema\");window.location='../mantenimiento/crearSubCat.php';</script>";
-            }
+            } 
         } else if ($acc == 2) { //Detecta si se va a actualizar una Categoría
             $idSubCat = $uri['idSubCat'];
             $nombreCat = filter_input(INPUT_POST, 'nombreSubCat');
